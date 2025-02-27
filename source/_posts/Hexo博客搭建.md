@@ -9,7 +9,7 @@ tags:
 img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%E7%B4%A0%E6%9D%90/1080P%20A%20%E6%94%B6%E8%97%8F%E9%87%8F%E6%9C%80%E5%A4%9A/1080PA%E5%A3%81%E7%BA%B870.jpg
 ---
 
-去掉图片图注正则表达式：`!\[[^\]]*\]`,上次处理到2024ciscn wp
+去掉图片图注正则表达式：`!\[[^\]]*\]`,上次处理到Tomcat下获取StandardContext的方法(JSP转Java内存马)
 # Problem
 1. hexo d老是卡住：`git config --global http.proxy 'socks5://127.0.0.1:10086'`
     和`git config --global https.proxy 'socks5://127.0.0.1:10086'`开代理

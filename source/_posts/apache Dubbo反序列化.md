@@ -28,7 +28,7 @@ Java RPC（Remote Procedure Call）是一种允许在分布式系统中执行跨
 
 * JAVA 中的RPC框架：包括JAVA RMI、gRPC、Dubbo、Thrift，这些框架的对比如下
 
-![image-20241231140622076](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241231140622076.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241231140622076.png)
 
 hessian 是一种跨语言的高效二进制序列化方式。但Dubbo Hessian实际不是原生的 hessian2 序列化，而是阿里修改过的 hessian lite
 
@@ -38,7 +38,7 @@ Dubbo 提供了内置 RPC 通信协议实现，但它不仅仅是一款 RPC 框�
 
 在Dubbo架构中，服务端和客户端分别被称作Provider(提供者)、Consumer(消费者)
 
-![image-20241231150621378](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241231150621378.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241231150621378.png)
 
 
 
@@ -61,7 +61,7 @@ clientPort=2181
 
 windows下双击bin目录下的zkServer.cmd即可启动
 
-![image-20241231150125754](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241231150125754.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241231150125754.png)
 
 根据dubbo官网可以快速创建一个基于Spring Boot的Dubbo应用，不过是3.3版本的dubbo：
 
@@ -140,31 +140,31 @@ Apache Dubbo = 2.5.x
 
 直接看到dubbo-sample-http模块
 
-![image-20250123111239232](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123111239232.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123111239232.png)
 
 在该模块下添加CC依赖测试漏洞
 
 改下http port为80，原来是8080，和burp冲突了
 
-![image-20250123114443867](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123114443867.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123114443867.png)
 
 官方给的demo不用单独开个zookeeper，代码已经集成了。如果想单独开一个可以把new EmbeddedZooKeeper注释掉
 
-![image-20250123164555811](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123164555811.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123164555811.png)
 
 bp向`/org.apache.dubbo.samples.http.api.DemoService`打CC链，弹出计算器
 
-![image-20250123164619601](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123164619601.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123164619601.png)
 
 弹不出的看下request 16进制，`0d 0a 0d 0a`换行后紧接的应该是`ac ed 00 05`的反序列化头
 
-![image-20250123164810236](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123164810236.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123164810236.png)
 
 就不从头分析了，分发过程太复杂了
 
 断点打在com.alibaba.dubbo.remoting.http.servlet.DispatcherServlet#service
 
-![image-20250123165211719](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123165211719.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123165211719.png)
 
 >在2.7.x版本软件包已经从com.alibaba转移到了org.apache
 >
@@ -200,29 +200,29 @@ bp向`/org.apache.dubbo.samples.http.api.DemoService`打CC链，弹出计算器
 
 判断了是否为POST，否则返回500
 
-![image-20250123170154007](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123170154007.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123170154007.png)
 
 此时的skeleton是HttpInvokerServiceExporter，这是个spring http的类
 
-![image-20250123170338970](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123170338970.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123170338970.png)
 
 继续调用HttpInvokerServiceExporter.handleRequest
 
-![image-20250123170356799](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123170356799.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123170356799.png)
 
-![image-20250123171450201](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123171450201.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123171450201.png)
 
 跟进到readRemoteInvocation，先调用createObjectInputStream创建一个ObjectInputStream
 
-![image-20250123171822107](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123171822107.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123171822107.png)
 
 这里参数里的`is`就是我们POST的数据，等于说就是用ObjectInputStream封装了参数`is`
 
-![image-20250123172303695](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123172303695.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123172303695.png)
 
 然后调用doReadRemoteInvocation，里面直接调用了readObject，触发反序列化漏洞
 
-![image-20250123172411564](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123172411564.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123172411564.png)
 
 
 
@@ -233,7 +233,7 @@ bp向`/org.apache.dubbo.samples.http.api.DemoService`打CC链，弹出计算器
 
 在2.7.5及以后版本不再使用HttpInvokerServiceExporter处理http请求，而是使用com.googlecode.jsonrpc4j.JsonRpcServer，调用其父类的JsonRpcBasicServer#handle处理
 
-![image-20250210183239520](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210183239520.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210183239520.png)
 
 
 
@@ -256,7 +256,7 @@ Rome、XBean、Resin、SpringPartiallyComparableAdvisorHolder、SpringAbstractBe
 
 调试前关闭`启用"toString"对象试图`，否则漏洞会提前触发
 
-![image-20250123183935529](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123183935529.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250123183935529.png)
 
 
 
@@ -268,7 +268,7 @@ https://github.com/apache/dubbo-spring-boot-project/tree/2.7.3
 
 使用该demo的dubbo-spring-boot-samples/auto-configure-samples的provider-sample DubboAutoConfigurationProviderBootStrap
 
-![image-20250124133052585](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250124133052585.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250124133052585.png)
 
 在provider-samples下的pom中加入rome依赖
 
@@ -280,7 +280,7 @@ https://github.com/apache/dubbo-spring-boot-project/tree/2.7.3
 </dependency>
 ```
 
-![image-20250124133237770](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250124133237770.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250124133237770.png)
 
 JNDI注入如下：
 
@@ -423,99 +423,99 @@ public class GadgetsTestHessian {
 
 第一个断点打在`org.apache.dubbo.rpc.protocol.dubbo.DubboCountCodec#decode()`
 
-![image-20250126105445645](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126105445645.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126105445645.png)
 
 跟进到ExchangeCodec.decode，调用了另一个同名函数decode
 
-![image-20250126105656818](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126105656818.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126105656818.png)
 
 该decode就是先检查魔数、数据长度、负载是否符合要求，如果没问题就调用decodeBody解码消息体，跟进decodeBody
 
-![image-20250126110404905](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126110404905.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126110404905.png)
 
-![image-20250126110724144](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126110724144.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126110724144.png)
 
 `DubboCodec#decodeBody()`是Dubbo解码Dubbo协议消息体的主要函数，根据消息类型(请求或响应)进行不同的处理，如下图`if为真`就作为响应处理
 
-![image-20250126111414262](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126111414262.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126111414262.png)
 
 我们发起的攻击是request，所以进入else。先跟进到CodecSupport.deserialize()
 
-![image-20250126111658022](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126111658022.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126111658022.png)
 
 通过getSerialization获取反序列化器
 
-![image-20250126111720683](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126111720683.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126111720683.png)
 
 反序列化器用一个HashMap静态变量`ID_SERIALIZATION_MAP`存储了
 
-![image-20250126111855182](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126111855182.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126111855182.png)
 
 根据url和id，用的键为2的反序列化器，也就是Hessian2Serialization
 
-![image-20250126112055858](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126112055858.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126112055858.png)
 
-![image-20250126112107718](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126112107718.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126112107718.png)
 
 接着就能跟进到Hessian2Serialization.deserialize，实例化了一个Hessian2ObjectInput
 
-![image-20250126113103658](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126113103658.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126113103658.png)
 
 中间有些loadClass加载caucho hessian类的过程
 
-![image-20250126113633663](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126113633663.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126113633663.png)
 
 可以看见后面返回的封装内容，其中`_is`就是我们传入的payload流
 
-![image-20250126135906487](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126135906487.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250126135906487.png)
 
 随后调用了ExchangeCodec.decodeHeartbeatData
 
-![image-20250208155904451](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208155904451.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208155904451.png)
 
 在该方法内直接调用了Hessian2ObjectInput.readObject
 
-![image-20250208160001777](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208160001777.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208160001777.png)
 
 继续跟进到`Hessian2Input.readObject(List<Class<?>> expectedTypes)`处，直接跳到了case H（为什么是H后面会说），这里发现是取的Map的反序列化器
 
-![image-20250208160116587](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208160116587.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208160116587.png)
 
 所以跳到了MapDeserializer.readMap，并调用了doReadMap
 
-![image-20250208160647497](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208160647497.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208160647497.png)
 
-![image-20250208160734685](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208160734685.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208160734685.png)
 
 doReadMap循环readObject输入流，只不过此处的readObject是Hessian的readObject而不是原生的ObjectInputStream
 
-![image-20250208160817723](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208160817723.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208160817723.png)
 
 OK此处用Hessian反序列化出了EqualsBean
 
-![image-20250208162159378](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208162159378.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208162159378.png)
 
 在还原出EqualsBean后，会调用map.put
 
-![image-20250208162348496](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208162348496.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208162348496.png)
 
 在put的时候，进入经典的put -> hash -> EqualsBean.hashCode() 触发ROME链的过程
 
-![image-20250208162422937](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208162422937.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208162422937.png)
 
 现在我们回过头来可以发现，为什么会进入case H? 因为我们传输的就是个hashMap，以h打头，而且也解释了为什么会直接取的是MapDeserializer
 
 而且在还原对象的时候，跟进到in.readObject
 
-![image-20250208195024052](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208195024052.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208195024052.png)
 
 继续跟进五步左右，看到调用了instantiate
 
-![image-20250208195125709](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208195125709.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208195125709.png)
 
 所以dubbo hessian反序列化是通过构造函数还原的类
 
-![image-20250208195326865](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208195326865.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208195326865.png)
 
 payload之所以用反射装填hashMap，是怕提前触发了map.put
 
@@ -629,7 +629,7 @@ public class diyTestHessian {
 }
 ```
 
-![image-20250208194612706](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208194612706.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208194612706.png)
 
 调用栈：
 
@@ -723,7 +723,7 @@ args=[toStringBean])
 
 抓包发现响应包进行报错，`any:1.0:20880 in [org.apache.dubbo.spring.boot.demo.consumer.DemoService:1.0.0:20880]`
 
-![image-20250208154456286](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208154456286.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208154456286.png)
 
 调试一下，在decodeHeartbeatData()肯定不会触发漏洞了，因为没有map，不会进入MapDeserializer.doReadMap
 
@@ -731,7 +731,7 @@ args=[toStringBean])
 
 把断点打在`DecodeHandler.received(Channel channel, Object message)`处，此时已经还原完成了对象，准备进行处理
 
-![image-20250208203334040](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208203334040.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208203334040.png)
 
 根据消息类型（请求、响应、字符串）进行不同处理：
 请求：区分事件请求、双向请求和单向请求。
@@ -740,39 +740,39 @@ args=[toStringBean])
 
 我们这里进行的当然是双向请求，还要获取服务器响应的那种。调用handleRequest
 
-![image-20250208203950239](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208203950239.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208203950239.png)
 
 接着调用reply
 
-![image-20250208204216033](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208204216033.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208204216033.png)
 
 reply内调用了getInvoker，别忘了Dubbo rpc的初衷，就是为了远程调用方法
 
-![image-20250208204248203](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208204248203.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208204248203.png)
 
 在getInvoker中，尝试从exporterMap中获取指定的service_name:method_name方法，但是没找到，于是走到throw new RemotingException报异常
 
-![image-20250208204421773](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoratyporaimage-20250208204421773.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoratyporaimage-20250208204421773.png)
 
-![image-20250208204454769](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208204454769.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208204454769.png)
 
 关键就是字符串拼接的时候，会自动调用StringBuilder.append方法，此处inv正是包含恶意请求的DecodeableRpcInvocation
 
-![image-20250208205133919](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208205133919.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208205133919.png)
 
 继续跟进到RpcInvocation.toString，发现调用了Array.toString
 
-![image-20250208205152287](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208205152287.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208205152287.png)
 
 参数就是ToStringBean的一个Object[]
 
-![image-20250208205303633](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208205303633.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208205303633.png)
 
 然后是一个Array的循环调valueOf，随后进入ToStringBean触发rome链
 
-![image-20250208205417863](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208205417863.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208205417863.png)
 
-![image-20250208205439942](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208205439942.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208205439942.png)
 
 回到上面验证一下猜想，如下，填入正确的`service_name`,`method_name`,`service_version`，就不会弹计算器，因为没报找不到方法的异常
 
@@ -812,23 +812,23 @@ args=[toStringBean])
 
 低版本DecodeableRpcInvocation.decode如下：
 
-![image-20250208211854161](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208211854161.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250208211854161.png)
 
 2.7.7版本内DecodeableRpcInvocation增加了一个if判断，判断失败会抛出IllgalArgumentException
 
-![image-20250210194934806](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210194934806.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210194934806.png)
 
 RpcUtils.isGenericCall()对比了method参数是否和`INVOKE`常量或者`INVOKE_ASYNC`常量的值相同
 
-![image-20250210194946386](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210194946386.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210194946386.png)
 
-![image-20250210195027789](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210195027789.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210195027789.png)
 
 RpcUtils.isEcho也是类似
 
-![image-20250210195003228](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210195003228.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210195003228.png)
 
-![image-20250210195055837](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210195055837.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210195055837.png)
 
 
 
@@ -869,9 +869,9 @@ args=[toStringBean])
 
 在2.7.8版本，DecodeableRpcInvocation.decode增加限制了参数类型为`Ljava/lang/String;[Ljava/lang/String;[Ljava/lang/Object;` 或者``Ljava/lang/Object;`
 
-![image-20250210195253195](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210195253195.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210195253195.png)
 
-![image-20250210195408180](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210195408180.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250210195408180.png)
 
 至此上面的攻击失效
 
@@ -916,33 +916,33 @@ args=[new_object('java.lang.Class')])
 
 依旧是看到DecodeableRpcInvocation#decode方法
 
-![image-20250212185206039](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212185206039.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212185206039.png)
 
 注意到设置path、version、method_name都是通过in.readUTF进行的，此处的in是Hessian2ObjectInput
 
-![image-20250212185327107](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212185327107.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212185327107.png)
 
 跟进到readUTF，调用了Hessian2Input.readString
 
-![image-20250212185719315](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212185719315.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212185719315.png)
 
 理论上来说，这里的version值应该是`"1.0.0"`，应该是个字符串，但是我们传的ToStringBean，所以转向default；在default中是个throw异常
 
-![image-20250212185946094](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212185946094.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212185946094.png)
 
-![image-20250212185909886](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212185909886.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212185909886.png)
 
 重点是Hessian2Input有自己的expect异常函数
 
-![image-20250212190125740](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212190125740.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212190125740.png)
 
 此处同样存在两个触发点：
 
 一个调用到了readObject，通过Hessian2的MapDeserializer触发
 
-![image-20250212190255336](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212190255336.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212190255336.png)
 
-![image-20250212190405790](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212190405790.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212190405790.png)
 
 如上文触发点1，向service_version打个hashMap即可
 
@@ -950,13 +950,13 @@ args=[new_object('java.lang.Class')])
 
 第二个触发点依旧是报错，字符串拼接触发toString
 
-![image-20250212190520839](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212190520839.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212190520839.png)
 
 由此可知，2.7.0-2.7.13dubbo 通过hashMap打ROME链，在调用到readUTF的地方都适用，也就是包括`path`、`service_version`和`args`参数都可以打
 
 在python DubboClient库DubboRequest分别对应以下参数
 
-![image-20250212190947947](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212190947947.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212190947947.png)
 
 #### 漏洞触发点3
 
@@ -978,11 +978,11 @@ Bytes.long2bytes(new Random().nextInt(100000000), header, 4);
 
 Dubbo通信的具体数据包规定如下图所示
 
-![image-20250209111658403](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250209111658403.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250209111658403.png)
 
 https://cn.dubbo.apache.org/zh/blog/2018/10/05/dubbo-%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/
 
-![image-20250209111719197](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250209111719197.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250209111719197.png)
 
 开头的0xdabb用来判断是不是dubbo协议数据包，如果是则调用decodeBody
 
@@ -990,11 +990,11 @@ https://cn.dubbo.apache.org/zh/blog/2018/10/05/dubbo-%E5%8D%8F%E8%AE%AE%E8%AF%A6
 
 >心跳事件是一种定期发生的信号或消息，用于确认系统中两个或多个组件之间的连接状态。
 
-![image-20250212191556106](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212191556106.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212191556106.png)
 
 ExchangeCodec.decodeHeartbeatData内调用了hessian2的readObject，造成反序列化漏洞
 
-![image-20250212191920577](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212191920577.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212191920577.png)
 
 注意，本文提及的readObject触发的漏洞均为hessian2ObjectInput流漏洞，在MapDeserializer触发map.put，而不是普通序列化流ObjectInputStream的漏洞
 
@@ -1004,15 +1004,15 @@ ExchangeCodec.decodeHeartbeatData内调用了hessian2的readObject，造成反�
 header[2] = (byte) ((byte) 0x80 | 0x20 | 2);
 ```
 
-![image-20250212192608285](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212192608285.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212192608285.png)
 
 针对2.7.8版本对心跳包的攻击，2.7.9在ExchangeCodec.decodeBody使用decodeEventData处理
 
-![image-20250212194249310](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212194249310.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212194249310.png)
 
 判断了待反序列化的数据长度是否超过阈值(50)，超过则抛出IllegalArugumentException
 
-![image-20250212194338642](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212194338642.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212194338642.png)
 
 也就是说dubbo>=2.7.9时只能选用hashMap打hessian2 readObject去触发漏洞
 
@@ -1036,7 +1036,7 @@ Dubbo Provider默认使用dubbo协议进行RPC通信，而dubbo协议默认使�
 
 如下分别是设置白名单和黑名单
 
-![image-20250209105802674](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250209105802674.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250209105802674.png)
 
 [Hessian2 whitelist by chickenlj · Pull Request #6378 · apache/dubbo · GitHub](https://github.com/apache/dubbo/pull/6378)
 
@@ -1071,7 +1071,7 @@ Dubbo可以支持很多类型的反序列化协议，以满足不同系统对RPC
 
 Dubbo中对支持的协议做了一个编号，每个序列化协议都有一个对应的编号，以便在获取TCP流量后，根据编号选择相应的反序列化方法。在org.apache.dubbo.common.serialize.Constants中可见每种序列化协议的编号
 
-![image-20250209111152673](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250209111152673.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250209111152673.png)
 
 而在Dubbo的RPC通信时，对流量的规定最前方为header，而header中通过指定 SerializationID，确定客户端和服务提供端通信过程使用的序列化协议。
 
@@ -1511,53 +1511,53 @@ ToStringBean.toString
 
 调用了CodecSupport.deserialize
 
-![image-20250214134411114](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214134411114.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214134411114.png)
 
 跟进，取到的序列化器为KryoSerialization
 
-![image-20250214134448746](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214134448746.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214134448746.png)
 
 用KryoObjectInput做封装
 
-![image-20250214134535582](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214134535582.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214134535582.png)
 
 回到CodecSupport.deserialize，调用了DecodeableRpcInvocation.decode
 
-![image-20250214134625113](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214134625113.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214134625113.png)
 
 尽管代码一样，也调用了readUTF
 
-![image-20250214135053264](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135053264.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135053264.png)
 
 但是此处的readUTF input变量不再是hessian2Input，而是普通input类
 
-![image-20250214135137075](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135137075.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135137075.png)
 
 也就没有自定义的except去拼接字符串，所以这个点不再能触发漏洞
 
-![image-20250214135211063](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135211063.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135211063.png)
 
 但正是因为不再是hessian2Input，readObject处不再是通过case去用readMap还原hashMap
 
-![image-20250214135512149](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135512149.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135512149.png)
 
 跟进到KryoObjectInput，调用了readClassAndObject
 
-![image-20250214135621052](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135621052.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135621052.png)
 
 先获取了Type为HashMap
 
-![image-20250214135925874](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135925874.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214135925874.png)
 
 然后调用Map反序列化器的read方法
 
-![image-20250214140048283](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214140048283.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214140048283.png)
 
-![image-20250214140155105](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214140155105.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214140155105.png)
 
 跟进read，还原对象后调用HashMap.put
 
-![image-20250214140258671](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214140258671.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214140258671.png)
 
 剩下就是put后链子了，和hessian一样
 
@@ -1569,7 +1569,7 @@ Fst反序列化和Kryo、hessian差不多，懒得调了
 
 kryo>=5.0.0后，只有被注册过的类才能被序列化和反序列化，被注册的类只有如下基本类型
 
-![6188e66e-384e-4086-823b-d04919a5be6d](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora6188e66e-384e-4086-823b-d04919a5be6d.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora6188e66e-384e-4086-823b-d04919a5be6d.png)
 
 
 
@@ -1604,33 +1604,33 @@ args=[new_object('java.lang.Class')])
 
 将目光转向DecodeHandler#received
 
-![image-20250212204746928](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212204746928.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212204746928.png)
 
 尽管在DecodeableRpcInvocation#decode处过滤了远程调用rpc的name和参数类型，这里我们要传`$invoke`，参数传`Ljava/lang/String;[Ljava/lang/String;[Ljava/lang/Object;`使程序继续运行
 
-![image-20250212205124638](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212205124638.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212205124638.png)
 
 decode结束后调用HeaderExchangeHandler.received处理请求
 
 由于默认发的双向请求，所以进入handleRequest
 
-![image-20250212212431423](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212212431423.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212212431423.png)
 
 handleRequest里调用了reply方法
 
-![image-20250212212637621](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212212637621.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212212637621.png)
 
 跟进发现跳到了DubboProtocol的匿名内部类里面
 
-![image-20250212213125197](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212213125197.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212213125197.png)
 
 reply的后半段，调用了ProtocolFilterWrapper$CallbackRegistrationInvoker的invoke方法
 
-![image-20250212213237570](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212213237570.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212213237570.png)
 
 继续跟进到invoke内，继续跟进invoke，反正跟两三个invoke的样子
 
-![image-20250212213354105](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212213354105.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212213354105.png)
 
 跟到GenericFilter.invoke内，会对传入的 Invocation 对象进行校验：
 
@@ -1642,7 +1642,7 @@ reply的后半段，调用了ProtocolFilterWrapper$CallbackRegistrationInvoker�
 
 然后通过 findMethodByMethodSignature 反射寻找服务端提供的方法（也就是 sayHello 方法），如果没找到将抛出异常。
 
-![image-20250212213624387](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212213624387.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212213624387.png)
 
 五个if，根据generic参数选择不同的反序列化，最后都是反序列化成pojo对象。共有以下类型：
 
@@ -1652,25 +1652,25 @@ reply的后半段，调用了ProtocolFilterWrapper$CallbackRegistrationInvoker�
 - ProtobufGenericSerialization(protobuf-json)
 - GenericReturnRawResult(raw.return)
 
-![image-20250212214229378](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212214229378.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212214229378.png)
 
 先看第一个，满足isDefaultGenericSerialization时，也就是generic为true
 
-![image-20250212215749324](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212215749324.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212215749324.png)
 
 会调用PojoUtils.realize
 
-![image-20250212215854573](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212215854573.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212215854573.png)
 
 下面是静态分析
 
 一直跟进到realize0，如果pojo为Map子类这个if里面，获取了class的值，并反射获取
 
-![image-20250212220607912](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212220607912.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212220607912.png)
 
 如果type不是Map或者Object，则实例化type，并反射调用其setter
 
-![image-20250212220936343](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212220936343.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212220936343.png)
 
 向上追溯这几个参数怎么传进去的，name是方法名sayHello，types是sayHello的参数，需要为`new String[] {"java.lang.String"}`，又要满足能通过`$invoke`验证，所以如下：
 
@@ -1684,15 +1684,15 @@ reply的后半段，调用了ProtocolFilterWrapper$CallbackRegistrationInvoker�
         out.writeObject(new String[] {"java.lang.String"});
 ```
 
-![image-20250212221406661](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212221406661.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250212221406661.png)
 
 第三个参数为args，也就是就是我们传的Object[]
 
-![image-20250214161301066](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214161301066.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214161301066.png)
 
 pojo就来自args，所以args Object[]存hashMap，取class键值和利用就OK了
 
-![image-20250214162645557](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214162645557.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214162645557.png)
 
 class装能用setter的对象，这里搞的org.apache.xbean.propertyeditor.JndiConverter（或者JdbcRowSetImpl都可以），args装方法名asText和参数jndi地址
 
@@ -1705,11 +1705,11 @@ class装能用setter的对象，这里搞的org.apache.xbean.propertyeditor.Jndi
 
 那generic呢？来自Attachment参数
 
-![image-20250214163143756](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214163143756.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214163143756.png)
 
 正常来说Attachment如下：
 
-![image-20250214163212300](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214163212300.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214163212300.png)
 
 java代码里在Dubbo协议尾部加个hashMap，自己会识别
 

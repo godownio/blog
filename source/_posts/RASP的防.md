@@ -25,7 +25,7 @@ https://xz.aliyun.com/t/4903?time__1311=n4%2Bxni0QKmTbG8DyDBqDqpYHQTRZnpoD
 
 按照文1进行环境搭建，文1中文件名应为MANIFEST.MF，文中写错了。文件应有MF配置的图标：
 
-![image-20241223215345951](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215345951.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215345951.png)
 
 给下我的各项配置：
 
@@ -33,11 +33,11 @@ https://xz.aliyun.com/t/4903?time__1311=n4%2Bxni0QKmTbG8DyDBqDqpYHQTRZnpoD
 
 Module：分别是agent,javawebAgent,test-struts2
 
-![image-20241223215408525](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215408525.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215408525.png)
 
 目录：
 
-![image-20241223215516346](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215516346.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215516346.png)
 
 agent下pom.xml：
 
@@ -148,15 +148,15 @@ Tomcat 虚拟机选项：
 -javaagent:E:\CODE_COLLECT\Idea_java_ProTest\javawebAgent\agent\target\agent.jar
 ```
 
-![image-20241223215629562](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215629562.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215629562.png)
 
 maven：
 
-![image-20241223215643587](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215643587.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215643587.png)
 
 按照文1写入类内容
 
-![image-20241223215725059](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215725059.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241223215725059.png)
 
 
 
@@ -164,7 +164,7 @@ maven：
 
 ASM中不同类不同方法的关系图如下：
 
-![20190427085315-d7534452-6886-1](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/20190427085315-d7534452-6886-1.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/20190427085315-d7534452-6886-1.png)
 
 
 
@@ -293,29 +293,29 @@ TestClassVisitor.transform在哪个地方触发的呢？
 
 在下面触发时序图的MethodVistor前面
 
-![1569401079000-15689714569539](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/1569401079000-15689714569539.jpg)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/1569401079000-15689714569539.jpg)
 
 配个Tomcat的cmd.jsp：
 
 模块里新建个web模块
 
-![image-20241224104927113](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224104927113.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224104927113.png)
 
-![image-20241224105000924](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105000924.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105000924.png)
 
 新建一个展开型Web工件，把刚才创建的Web模块搞进去
 
-![image-20241224105246663](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105246663.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105246663.png)
 
-![image-20241224105047458](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105047458.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105047458.png)
 
 Tomcat部署
 
-![image-20241224105259845](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105259845.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105259845.png)
 
 目录里现在有了web目录
 
-![image-20241224105402087](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105402087.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105402087.png)
 
 向cmd.jsp写入
 
@@ -340,13 +340,13 @@ Tomcat部署
 
 Tomcat URL记得改成`ip:port/工件/xxx.jsp`，以便直接打开
 
-![image-20241224105436044](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105436044.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105436044.png)
 
 访问`http://localhost:8080/agent_Web_exploded/cmd.jsp?cmd=whoami`后，控制台执行打印加载流程和执行结果
 
-![image-20241224105537704](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105537704.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224105537704.png)
 
-![image-20241224112227328](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224112227328.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224112227328.png)
 
 case2  TestClassVistor重写ClassVistor.visitMethod ，在AgentTransform匹配到ProcessBuilder时打印`name方法描述符是desc`
 
@@ -431,7 +431,7 @@ public class TestClassVisitor extends ClassVisitor implements Opcodes {
 
 在 Java 字节码中，每个方法都有一个 **局部变量表**，它是 JVM 的一种数据结构，用来存储方法中的局部变量和方法参数。局部变量表在方法调用时创建，并且只在方法执行期间存活。对于实例方法，局部变量表的第 0 个槽位默认保存当前对象引用 `this`。比如：
 
-![image-20241229141551069](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229141551069.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229141551069.png)
 
 `ALOAD 0` 就是将 `this` 引用加载到操作数栈
 
@@ -443,7 +443,7 @@ public class TestClassVisitor extends ClassVisitor implements Opcodes {
  mv.visitFieldInsn(GETFIELD, "java/lang/ProcessBuilder", "command", "Ljava/util/List;");
 ```
 
-![image-20241229140543302](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229140543302.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229140543302.png)
 
 `INVOKESTATIC` 是 Java 字节码中的一条指令，用于调用**静态方法**。调用静态方法 cn/org/javaweb/agent/ProcessBuilderHook.start，传递获取的 command 字段;方法签名为 (Ljava/util/List;)V，表示接收一个 List 类型参数且无返回值。
 
@@ -459,9 +459,9 @@ mv.visitMethodInsn(INVOKESTATIC, "cn/org/javaweb/agent/ProcessBuilderHook", "sta
 
 比如执行python --version，RASP hook到后会打印执行的命令
 
-![image-20241224150736940](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224150736940.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224150736940.png)
 
-![image-20241224150749673](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224150749673.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241224150749673.png)
 
 
 
@@ -491,7 +491,7 @@ RASP覆盖整个应用堆栈，包括应用程序代码、所使用的库和框�
 
 首先，执行Instrumentation的agent是使用如ByteBuddy、ASM、Javassist等字节码操作库实现的。当启动Java程序时，主应用程序代码不会立即执行，Java将创建一个JVM，然后加载并启动-javaagent命令行参数所指定的Java agent。而agent会注册一个负责Hook的ClassTransformer，该Transformer用于安全防护。当应用程序正在运行并且正在加载一个新类时，类加载器将在加载此类时在Instrucmentation API上通知ClassTransformer。如果符合Hook规则，类会被修改，称作patched，最后加载到JVM。每当代码与这个类或API交互时，RASP都会察觉，并判断此类代码是否应继续执行。
 
-![image6](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image6.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image6.png)
 
 ### RASP、WAF、EDR的区别
 
@@ -499,7 +499,7 @@ RASP、WAF和EDR是三种安全技术，可以单独使用，也可以组合使�
 
 所以RASP在扩展检测与响应(XDR)中发挥着重要作用，提供应用程序层面的监测。
 
-![image7](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image7.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image7.png)
 
 WAF、RASP和EDR并不构成直接竞争关系。在SQL注入的场景，攻击者利用编码技巧绕过了WAF，RASP未能及时patch应用程序时，EDR能在SQL服务器被攻破并试图启动PowerShell脚本时成功阻止攻击。所以WAF、RASP、EDR应该是协同工作，互相补充。
 
@@ -513,7 +513,7 @@ Java Security Manager的问题在于它不具备供应链感知能力，只能�
 
 在实现RASP解决方案之前，先要了解Java应用可能遭受的攻击类型及其防护方法。攻击者要入侵应用，首先要找到入口，可能是一个暴露了Web服务的容器，如Netty或Tomcat HTTP。当攻击者发起请求时，应用可能遭受反序列化漏洞、SQL注入等，或包含有可被利用的0day漏洞的第三方库和框架，导致攻击者能在机器上执行任意代码，如图。
 
-![image8](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image8.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image8.png)
 
 一旦攻击者设法在JVM上执行代码，就可以决定是否启动一个进程，EDR会检测到进程启动。但是攻击者可以选择窃取敏感数据，部署恶意库并将其加载到JVM中，不会新启动进程从而逃避EDR的检测。除此以外，攻击者还可以暂时留在JVM中，不留下任何文件的情况下部署一个无文件的WebShell，比如一些通过模拟注册Filter、Interceptor、Controller的Spring Shell，也可以破坏植入应用程序中的所有安全机制，随意越权使用应用的全部功能。
 
@@ -637,15 +637,15 @@ public class TestClassVisitor extends ClassVisitor implements Opcodes {
 
 上述说的实例化AnnotationVisitor、FieldVisitor、MethodVisitor分别对应ClassVisitor的visitAnnotation、visitField、visitMethod方法。对应去重载，然后super父类的方法即可。
 
-![image-20241229120503899](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229120503899.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229120503899.png)
 
-![image-20241229120529965](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229120529965.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229120529965.png)
 
-![image-20241229120543654](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229120543654.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229120543654.png)
 
 从上面的时序图可以看出修改字节码的顺序，具体代码在ClassReader，太复杂了懒得看。
 
-![image-20241229120728657](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229120728657.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229120728657.png)
 
 
 
@@ -766,11 +766,11 @@ methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, Agent.class.getName().replac
 
 我们锁定到ognl.Ognl#expression的代码，可以看到这是个静态方法，索引为0代表第一个参数，即解析的ognl表达式字符串
 
-![image-20241229143307023](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229143307023.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229143307023.png)
 
 方法内定义的局部变量也会按顺序存储在局部变量表中
 
-![image-20241229143730958](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229143730958.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229143730958.png)
 
 辅助类：
 
@@ -834,15 +834,15 @@ public class MethodHookDesc {
 <include>org.javassist:javassist:jar:*</include>
 ```
 
-![image-20241229161043725](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229161043725.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229161043725.png)
 
 maven打包后重新加个JAR应用程序配置，虚拟机选项依旧得填上
 
-![image-20241229161109320](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229161109320.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229161109320.png)
 
 MANIFEST.MF加上主类`Main-Class: cn.org.javaweb.agent.MainTest`
 
-![image-20241229161133286](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229161133286.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229161133286.png)
 
 ```java
 import ognl.Ognl;
@@ -864,19 +864,19 @@ public class MainTest {
 
 运行JAR应用程序后输出了EXP，也就是表达式字符串，还有调用链
 
-![image-20241229161229675](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229161229675.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229161229675.png)
 
 org.mvel2.MVEL.eval同理
 
-![image-20241229163027281](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229163027281.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229163027281.png)
 
 >更深思考一步，假如我监测的是MVELInterpretedRuntime，需要压栈哪个变量才能获取表达式字符串？
 >
->![image-20241229163603632](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229163603632.png)
+>![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229163603632.png)
 >
 >继承的AbstractParser如下：
 >
->![image-20241229163713040](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229163713040.png)
+>![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229163713040.png)
 >
 >经调试，首先，parse没有接收任何参数，也没有在方法内定义任何变量。即局部变量表只有一个this，其他为空。
 >
@@ -911,7 +911,7 @@ org.mvel2.MVEL.eval同理
 
 因为是实例方法所以压栈的索引为1，也是成功拦截到了
 
-![image-20241229165748548](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229165748548.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229165748548.png)
 
 
 
@@ -919,7 +919,7 @@ org.mvel2.MVEL.eval同理
 
 上述demo需要在虚拟机选项，也就是启动参数加上-javaagent，而且每次修改都需要重新打包启动
 
-![image-20241229170406090](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229170406090.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229170406090.png)
 
 
 
@@ -1039,7 +1039,7 @@ public class CustomClassTransformer implements ClassFileTransformer {
 
 这里如果方法名为say的话，就使用`GETSTATIC`获取静态变量，对应了System的out变量
 
-![image-20241229212810242](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229212810242.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229212810242.png)
 
 修改变量值为`CALL xxx method`，作用就是在调用到say方法时控制台打印这个字符串。
 
@@ -1062,7 +1062,7 @@ Can-Set-Native-Method-Prefix: true
 
 现在maven打包上面修改后的agent模块
 
-![image-20241229220737173](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229220737173.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229220737173.png)
 
 由于agentmain是运行中修改，所以还要写个修改的程序：
 
@@ -1095,9 +1095,9 @@ public class Attachit_execinRun {
 
 JVM名称是按照现在正在运行的程序来的，你可以把MainTest运行，然后打个断点查看
 
-![image-20241229220959088](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229220959088.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229220959088.png)
 
-![image-20241229221022947](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229221022947.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229221022947.png)
 
 
 
@@ -1115,11 +1115,11 @@ JVM名称是按照现在正在运行的程序来的，你可以把MainTest运行
 
 模块下新建个lib目录
 
-![image-20241229214105179](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229214105179.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229214105179.png)
 
 直到你的依赖项：
 
-![image-20241229214052084](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229214052084.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229214052084.png)
 
 下面是个演示：
 
@@ -1131,7 +1131,7 @@ JVM名称是按照现在正在运行的程序来的，你可以把MainTest运行
 
 答案是对的，下面是attach两次MainTest的结果，可以看到CALL了两次
 
-![image-20241229222138886](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229222138886.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229222138886.png)
 
 
 
@@ -1139,7 +1139,7 @@ JVM名称是按照现在正在运行的程序来的，你可以把MainTest运行
 
 现在让我们解答case2中提出的问题，为什么会打印命令的所有调用链？
 
-![image-20241229223252364](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229223252364.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241229223252364.png)
 
 因为当你调用` classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES) `时，ASM 会遍历整个类结构，对于每一个方法，都会调用` TestClassVisitor.visitMethod`（在这里就是ProceeBuilder的每一个方法）。而我们写的代码在触发到ProcessBuilder.start才会调用accept
 
@@ -1162,7 +1162,7 @@ throw new SecurityException("Detected malicious expression: " + exp_demo);
 
 但是agentmain是可以重复attach的，多次attach时，代码会重复插入。原生的JVM在运行时时为了程序的线程及逻辑安全，禁止向运行时的类添加新的public方法并重新定义该类。会报`class redefinition failed: attempted to add a method`错误
 
-![image-20241230095259187](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241230095259187.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241230095259187.png)
 
 
 
@@ -1226,7 +1226,7 @@ RASP的规则是需要经过专业的安全研究人员反复打磨并且根据�
 
 但是RASP不是万能的，并不能高效的防御所有的漏洞，其优劣势是非常明显的，应当正确的理解RASP本身的司职联合其他的防御措施构建完整的防御体系才能更好的做好安全防护。
 
-![image-20241230095914844](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241230095914844.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241230095914844.png)
 
 
 

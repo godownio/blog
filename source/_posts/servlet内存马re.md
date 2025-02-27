@@ -25,9 +25,9 @@ img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%
 
 https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.61/
 
-![image-20250219162707344](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219162707344.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219162707344.png)
 
-![image-20250219162815516](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219162815516.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219162815516.png)
 
 来个tomcat-catalina方便调试
 
@@ -41,7 +41,7 @@ https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.61/
 
 看到HelloServlet有个@WebServlet的注解，这其实是自动完成了把类注入进/hello-servlet的web映射
 
-![image-20250219163428214](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219163428214.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219163428214.png)
 
 效果等同于在WEB-INF/web.xml下写入以下代码，以xml形式注入
 
@@ -56,17 +56,17 @@ https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.61/
 </servlet-mapping>
 ```
 
-![image-20250219165958584](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219165958584.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219165958584.png)
 
 Tomcat控制台乱码：编辑自定义虚拟机选项，添加`-Dfile.encoding=UTF-8`
 
-![image-20250219172057822](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219172057822.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219172057822.png)
 
-![image-20250219172123255](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219172123255.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219172123255.png)
 
 Tomcat虚拟机选项也加上`-Dfile.encoding=UTF-8`
 
-![image-20250219172154253](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219172154253.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250219172154253.png)
 
 
 
@@ -74,7 +74,7 @@ Tomcat虚拟机选项也加上`-Dfile.encoding=UTF-8`
 
 servlet是一个Java应用程序，运行在服务器端，用来处理客户端请求并作出响应的程序。servlet没有main方法不能独立运行，需要使用servlet容器比如tomcat来创建。当我们通过URL来访问servlet，首先会在servlet容器中判断该URL是由哪个servlet处理的，当前容器中是否有这个servlet实例，如果没有则创建servlet实例，并交由对应servlet的service方法来处理请求，处理结束后再返回web服务器。
 
-![image-20201231105141162](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20201231105141162.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20201231105141162.png)
 
 Servlet分别有以下几个方法：
 
@@ -94,7 +94,7 @@ public interface Servlet {
 
 在servlet生命周期中，service是处理请求的主方法，作为其实现类，HttpServlet在service方法中，根据不同类型调用了不同的doxxx方法去处理
 
-![image-20250220105518945](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220105518945.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220105518945.png)
 
 而且Web应用程序的调用顺序是Listener -> Filter -> Servlet，Servlet马是最后触发的
 
@@ -104,63 +104,63 @@ public interface Servlet {
 
 先是新建了一个webXmlParser，然后调用getContextWebXmlSource获取了本地web.xml的地址
 
-![image-20250225132302190](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225132302190.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225132302190.png)
 
-![image-20250225132401601](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225132401601.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225132401601.png)
 
 其他的代码都是一些初始化和合并web.xml和fragments.xml的代码，具体的应用xml锁定到configureContext()
 
-![image-20250225132711776](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225132711776.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225132711776.png)
 
 在大概1280行的样子，是对web.xml中的servlet进行循环解析。
 
-![image-20250225132855796](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225132855796.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225132855796.png)
 
 介绍一下这个for循环的核心内容：
 
 1. 调用context.createWrapper新建StandardWrapper，这里的context是StandardContext
 
-![image-20250225133521318](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225133521318.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225133521318.png)
 
 2. 接着调用getLoadOnStartup，判断是否自定义懒加载模式，如果开启则设置wrapper为相应的模式
 
-![image-20250225133606416](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225133606416.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225133606416.png)
 
 3. setName设置ServletName
 
-![image-20250225134109978](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225134109978.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225134109978.png)
 
 4. setServletClass设置servlet的全限定名
 
-![image-20250225134652763](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225134652763.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225134652763.png)
 
 以上的set从servlet变量值就能看出，最简单的servlet其实只有两个值需要设置，servletName，servletClass，连loadOnStartup都不用设置。所以理论上我们手动创建servlet也只需要调用setName和setServletClass即可组装一个StandardWrapper以供使用
 
-![image-20250225134816274](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225134816274.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225134816274.png)
 
 5. 最后调用了context.addChild，把配置好的StandardWrapper向context里装填
 
-![image-20250225135012174](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225135012174.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225135012174.png)
 
 跟进到StanardContext.addChild，调用了父类ContainerBase的addChild
 
-![image-20250225135126717](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225135126717.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225135126717.png)
 
 继续跟进，调用了addChildInternal
 
-![image-20250225135204221](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225135204221.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225135204221.png)
 
 继续跟进，调用了child.start启动了这个子wrapper
 
-![image-20250225135242177](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225135242177.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225135242177.png)
 
 在上一个for循环后面的一个for，遍历了所有的servletMappings，调用addServletMappingDecoded，根据参数一看就是添加URL映射
 
-![image-20250225140021944](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225140021944.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225140021944.png)
 
 除此之外还有一个StandardWrapper的方法需要调用，是setServlet，这个方法是在实例化后调用的，现在初始化暂时调不出来
 
-![image-20250225144616007](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225144616007.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225144616007.png)
 
 现在知道了向context添加自定义servlet的过程了：
 
@@ -182,15 +182,15 @@ public interface Servlet {
 
 jsp里自带了对象request，且是tomcat catalina自带的org.apache.catalina.connector.RequestFacade，该类自带了getServletContext方法
 
-![image-20250225143027069](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225143027069.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225143027069.png)
 
 随便写个jsp调用该方法，并打上断点访问
 
-![image-20250225142615492](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225142615492.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225142615492.png)
 
 可以看到getServletContext取到的是ApplicationContextFacade，下面有个context变量是ApplicationContext，再进一层的context变量是StandardContext
 
-![image-20250225143204852](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225143204852.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225143204852.png)
 
 我们可以通过两层反射取到StandardContext，而且每个 StandardContext 实例代表一个独立的Web应用程序，在一个web应用程序中，共用一个StandardContext
 
@@ -208,7 +208,7 @@ jsp里自带了对象request，且是tomcat catalina自带的org.apache.catalina
 
 网上流传的request.getSession().getServletContext()其实结果和request.getServletContext结果一样
 
-![image-20250225153034417](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225153034417.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225153034417.png)
 
 
 
@@ -220,19 +220,19 @@ jsp里自带了对象request，且是tomcat catalina自带的org.apache.catalina
 
 OK，现在根据下图，请求到达Server上的Tomcat service，是先交由connector连接器处理，断点打在Http11Protocol.service()上
 
-![tomcat3](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoratomcat3.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoratomcat3.png)
 
 前面的代码都是一些解析HTTP请求并赋值的操作，看到调用了getAdapter().service()
 
-![image-20250220111044039](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220111044039.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220111044039.png)
 
 显然这里getAdapter()取到的就是CoyoteAdapter
 
-![image-20250220111231430](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220111231430.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220111231430.png)
 
 跟进到CoyoteAdapter.service()，先是从org.apache.coyoye.Request封装中取出普通Request；Response同理
 
-![image-20250220112421730](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220112421730.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220112421730.png)
 
 接着调用如下代码
 
@@ -240,11 +240,11 @@ OK，现在根据下图，请求到达Server上的Tomcat service，是先交由c
 connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
 ```
 
-![image-20250220112624600](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220112624600.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220112624600.png)
 
 其中getContatianer是返回engine，这一步就对应了上图connector转交给Engine处理的过程
 
-![image-20250220113532562](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220113532562.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220113532562.png)
 
 connector.getService()返回StandardService
 
@@ -256,49 +256,49 @@ StandardPipeline.getFirst()返回StandardEngineValve
 
 于是跟进到了StandardEngineValve.invoke，此时为上图的Engine模块中。通过Request.getHost()获取了主机名，然后调用host.getPipeline().getFirst().invoke
 
-![image-20250220114310795](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220114310795.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220114310795.png)
 
 很显然，举一反三，这里的host为StandardHost，连跟几个invoke，跟进到StandardHostValve.invoke
 
-![image-20250220212740524](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220212740524.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220212740524.png)
 
 下一步就是从host中获取context了，从代码也可以看出调用了request.getContext()，得到StandardContext，接着调用了getPipeline().getFirst().invoke，
 
-![image-20250220213015287](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220213015287.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220213015287.png)
 
 中间的身份验证的东西先省略，大致可以看出是验证session的，来到AuthenticatorBase的getNext.invoke
 
-![image-20250220213148768](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220213148768.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220213148768.png)
 
 跟进到StandardContextValue.invoke
 
-![image-20250220213317303](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220213317303.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220213317303.png)
 
 然后是取Wrapper
 
-![image-20250220214748878](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220214748878.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220214748878.png)
 
-![image-20250220214816230](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220214816230.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220214816230.png)
 
 OK现在跟进到了StandardWrapperValve.invoke，在该方法内，先是调用wrapper.allocate()
 
-![image-20250225130453564](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225130453564.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225130453564.png)
 
 allocate()内，如果满足if条件，会调用loadServlet，虽然这里不会进入这个if，但是可以提前看一下loadServlet的内容
 
-![image-20250225130515447](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225130515447.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225130515447.png)
 
 调用了instanceManger.newInstance，显然是实例化servlet类，前面在webConfig把servlet从web.xml加载到了StandardContext，但是因为Tomcat懒加载，并没有立即进行实例化
 
 >Tomcat具有懒加载的功能，启动Tomcat时，不会实例化servlet，等第一次访问servlet url时，才会调用`org.apache.catalina.core.DefaultInstanceManager#newInstance(java.lang.String)`进行实例化
 
-![image-20250225130617354](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225130617354.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225130617354.png)
 
 回到StandardWrapperValve.invoke
 
 调用了ApplicationFilterFactory.createFilterChain()去创建一个Filter链，然后在if块内，如果是异步分派就是调用doInternalDispatch，如果不是就直接调用filterChain.doFilter。这段在之后分析Filter内存马的时候还会见到
 
-![image-20250220215002701](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220215002701.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220215002701.png)
 
 这段不用自己去手动调用
 

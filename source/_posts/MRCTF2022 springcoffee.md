@@ -32,13 +32,13 @@ img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%
 
 /coffee/order路由如下，重点在于用kryo.readClassAndObject去反序列化了(CoffeRequest) coffee的extraFlavor字段
 
-![image-20250215145915305](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250215145915305.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250215145915305.png)
 
 CoffeeRequest是个自定义的javaBean
 
 /coffee/demo如下，具体功能如下：
 
-![image-20250215151233961](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250215151233961.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250215151233961.png)
 
 ```java
     @RequestMapping({"/coffee/demo"})
@@ -88,13 +88,13 @@ CoffeeRequest是个自定义的javaBean
 
 看看依赖，除了kryo依赖还有rome
 
-![image-20250215151821807](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250215151821807.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250215151821807.png)
 
 由上篇//todo分析的Dubbo中 kryo反序列化可知，用kryo.readClassAndObject去进行反序列化，如果传入的对象是HashMap，获取到的序列化器为Mapdeserializer，会触发到HashMap.put进而触发Rome链
 
-![image-20250216191657589](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216191657589.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216191657589.png)
 
-![image-20250214140258671](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214140258671.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250214140258671.png)
 
 直接随便搞个rome payload如下，用kryo.writeClassAndObject写序列化流：
 
@@ -208,33 +208,33 @@ public class kryo_MRCTF {
 
 直接一个大注入进去，结果报Class is not registered
 
-![image-20250216212932013](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216212932013.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216212932013.png)
 
 原因Kyro在5.0.0后，默认开启了registrationRequired
 
-![image-20250216192240967](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216192240967.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216192240967.png)
 
 在readClassAndObject的时候会调用readClass
 
-![image-20250216204444786](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216204444786.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216204444786.png)
 
 继续跟进，在getRegistration获取的registration，这里面registration==null且registrationRequired开启就会报错
 
-![image-20250216205122038](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216205122038.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216205122038.png)
 
 也就是说只允许序列化和反序列化如下对象：
 
-![image-20250216192506739](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216192506739.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216192506739.png)
 
 
 
 OK关键就在于registrationRequired，回到/coffee/demo路由，这里新建了一个Kryo并能调用任意单参数setter去设置该Kryo的值
 
-![image-20250216205544054](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216205544054.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216205544054.png)
 
 很显然Kryo里有这个setter去修改RegistrationRequired值
 
-![image-20250216205731243](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216205731243.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216205731243.png)
 
 但是每次请求不都是会new一个Kryo吗？
 
@@ -246,13 +246,13 @@ OK关键就在于registrationRequired，回到/coffee/demo路由，这里新建�
 {"polish":true,"RegistrationRequired":false}
 ```
 
-![image-20250216213135880](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216213135880.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250216213135880.png)
 
 报无法强转为ExtraFlavor，那就是顺利反序列化了，但是为什么没弹计算器？
 
-![image-20250218151034841](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218151034841.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218151034841.png)
 
-![image-20250218151100325](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218151100325.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218151100325.png)
 
 原来是references要对齐！什么意思呢？
 
@@ -260,11 +260,11 @@ OK关键就在于registrationRequired，回到/coffee/demo路由，这里新建�
 
 >References即引用，对A对象序列化时，默认情况下kryo会在每个成员对象第一次序列化时写入一个数字，该数字逻辑上就代表了对该成员对象的引用，如果后续有引用指向该成员对象，则直接序列化之前存入的数字即可，而不需要再次序列化对象本身。这种默认策略对于成员存在互相引用的情况较有利，否则就会造成空间浪费（因为没序列化一个成员对象，都多序列化一个数字），通常情况下可以将该策略关闭，kryo.setReferences(false);
 >
->![image-20250218160019322](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218160019322.png)
+>![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218160019322.png)
 
 从代码上来看，如果发送端references为true，而服务器references为false时，在Kryo.readReferenceOrNull中多调用了一次readVarInt
 
-![image-20250218153741161](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218153741161.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218153741161.png)
 
 同理，只要服务器和发送端的references不一致，就会造成反序列化错误
 
@@ -299,29 +299,29 @@ OK关键就在于registrationRequired，回到/coffee/demo路由，这里新建�
 
 现在报错如下，`Class cannot be created (missing no-arg constructor)`，反序列化的类需要有无参构造函数，而HotSwappableTargetSource没有
 
-![image-20250218162125099](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218162125099.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218162125099.png)
 
 跟进到报错点DefaultInstantiatorStraregy.newInstantiatorOf，里面获取了无参构造器并实例化
 
-![image-20250218162715359](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218162715359.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218162715359.png)
 
 newInstantiator调用了newInstantiatorOf
 
-![image-20250218162925696](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218162925696.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218162925696.png)
 
 可以看到strategy默认设置为了DefaultInstantiatorStrategy
 
-![image-20250218163008556](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218163008556.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218163008556.png)
 
 刚好有个setter可以设置这个属性
 
-![image-20250218163111070](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218163111070.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218163111070.png)
 
-![image-20250218163441596](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218163441596.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218163441596.png)
 
 copy一个官网图，StdInstantiatorStrategy不需要无参构造函数
 
-![19](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora19.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora19.png)
 
 所以：
 
@@ -461,11 +461,11 @@ public class kryo_MRCTF {
 
 现在本地能打通了
 
-![image-20250218172827590](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218172827590.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218172827590.png)
 
 加个Tomcat内存马打docker，这部分就不用多说了，改个字节码就OK
 
-![image-20250218180217661](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218180217661.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218180217661.png)
 
 
 
@@ -539,13 +539,13 @@ print(res)
 
 根目录如下，有flag，readflag，很显然直接读flag是不行的，需要执行readflag
 
-![image-20250218190307097](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218190307097.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218190307097.png)
 
 
 
 /app目录下有jrasp.jar
 
-![image-20250218190421723](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218190421723.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218190421723.png)
 
 再搞个读文件：
 
@@ -593,7 +593,7 @@ print(res)
 
 用Attach agent的方式过滤了ProcessImpl.start
 
-![image-20250218193516400](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218193516400.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218193516400.png)
 
 用ProcessImpl的下一层UNIXProcess，或者JNI的方式绕过
 
@@ -675,7 +675,7 @@ JRASP的JNI绕过改天再学习，具体就是自己编译一个native方法
 
 已经能执行命令了
 
-![image-20250218201316766](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218201316766.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218201316766.png)
 
 至于读flag，把readflag下下来一看是TM个C的文件，还有个交互才能OK
 
@@ -704,7 +704,7 @@ print "$r"';
 http://192.168.0.106:10805/coffee/demo?cmd=perl+-e+%27use+strict%3b%0ause+IPC%3a%3aOpen3%3b%0a%0amy+%24pid+%3d+open3(+%5c*CHLD_IN%2c+%5c*CHLD_OUT%2c+%5c*CHLD_ERR%2c+%22%2freadflag%22+)+or+die+%22open3()+failed!%22%3b%0a%0amy+%24r%3b%0a%24r+%3d+%3cCHLD_OUT%3e%3b%0aprint+%22%24r%22%3b%0a%24r+%3d+%3cCHLD_OUT%3e%3b%0aprint+%22%24r%22%3b%0a%24r+%3d+substr(%24r%2c0%2c-3)%3b%0a%24r+%3d+eval+%22%24r%22%3b%0aprint+%22%24r%5cn%22%3b%0aprint+CHLD_IN+%22%24r%5cn%22%3b%0a%24r+%3d+%3cCHLD_OUT%3e%3b%0aprint+%22%24r%22%27%3b
 ```
 
-![image-20250218203228462](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218203228462.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250218203228462.png)
 
 前半段都还好，后面这个计算题是给人做的？
 

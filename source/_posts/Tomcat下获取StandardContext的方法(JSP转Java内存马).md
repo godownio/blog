@@ -40,7 +40,7 @@ Tomcat中这三个StandardContext、ApplicationContext、ServletContext都是干
 
 在Tomcat环境下，jsp有tomcat catalina自带的org.apache.catalina.connector.RequestFacade类，直接用request即可得到该内置对象。通过反射即可获取StandardContext
 
-![image-20250225143204852](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225143204852.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225143204852.png)
 
 ```java
     ApplicationContextFacade applicationContextFacade = (ApplicationContextFacade) request.getServletContext();
@@ -54,7 +54,7 @@ Tomcat中这三个StandardContext、ApplicationContext、ServletContext都是干
 
 request.getSession().getServletContext()其实结果和request.getServletContext结果一样
 
-![image-20250225153034417](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225153034417.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225153034417.png)
 
 所以第一句可以改为如下
 
@@ -73,15 +73,15 @@ StandardContext standardContext = (StandardContext) req.getContext();
 
 同样随便找个jsp打上断点，org.apache.catalina.connector.Request#getContext如下，从mappingData中返回context
 
-![image-20250225164547298](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225164547298.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225164547298.png)
 
 jsp自带的Request.request已经装填好了mappingData
 
-![image-20250225164652296](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225164652296.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225164652296.png)
 
 这里JSP内置对象request其实是RequestFacade，封装了Request
 
-![image-20250225221250733](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225221250733.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225221250733.png)
 
 ## Tomcat Java获取StandardContext
 
@@ -105,11 +105,11 @@ StandardContext standardContext = (StandardContext)webappClassLoaderBase.getReso
 System.out.println(standardContext);
 ```
 
-![image-20250225171355936](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225171355936.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225171355936.png)
 
 其resources下有StandardContext
 
-![image-20250225171516780](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225171516780.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225171516780.png)
 
 >在多线程环境中，每个线程可以有自己的类加载器。
 
@@ -145,21 +145,21 @@ WebappclassLoader 的 getResources()方法，早在 8.5.78 的版本就被标为
 
 Tomcat接收到一个普通请求的栈帧如下：
 
-![image-20250225181305622](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225181305622.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225181305622.png)
 
 把目光锁定到org.apache.catalina.core.ApplicationFilterChain#internalDoFilter
 
 首先，ApplicationFilterChain有lastServicedRequest和lastServicedResponse变量，都是ThreadLocal类型，且分别为ServletRequest和ServletResponse
 
-![image-20250225190330789](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225190330789.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225190330789.png)
 
 internalDofIlter方法内，在执行完doFilter后，调用servlet.service前，如果`ApplicationDispatcher.WRAP_SAME_OBJECT`为true，则对lastServicedRequest和lastServicedResponse进行赋值
 
-![image-20250225191251754](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225191251754.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225191251754.png)
 
 这里的赋值来自于internalDoFilter参数，看样子等同于jsp的内置对象request
 
-![image-20250225191457946](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225191457946.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225191457946.png)
 
 于是有了利用思路：
 
@@ -167,7 +167,7 @@ internalDofIlter方法内，在执行完doFilter后，调用servlet.service前�
 
 2. 由于已经反射修改了`WRAP_SAME_OBJECT`，而if内的set是调用ThreadLocal.set()，肯定得先初始化lastServicedRequest和lastServicedResponse。代码可以直接copy ApplicationFilterChain static块
 
-![image-20250225193232467](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225193232467.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225193232467.png)
 
 3. 不管我们是在doFilter还是servlet.service处进行内存马利用，都需要先运行一遍internalDoFilter才能成功赋值。也就是需要访问两次对应servlet，一次反射赋值，一次取出request和response。而且lastServicedRequest和lastServicedResponse、WRAP_SAME_OBJECT都是final修饰，需要加一步反射。
 
@@ -225,7 +225,7 @@ internalDofIlter方法内，在执行完doFilter后，调用servlet.service前�
 
 显然threadLocalReq.get()取到的是RequestFacade，和jsp内置对象一样，就可以回到上面已有request继续利用
 
-![image-20250225194511432](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225194511432.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225194511432.png)
 
 但是上面的方法有两个缺点：
 
@@ -264,15 +264,15 @@ CC链自己肯定有，懒得贴了
 
 HttpServlet继承了GenericServlet
 
-![image-20250225214210834](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225214210834.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225214210834.png)
 
 GenericServlet实现了Servlet，ServletConfig，Serializable接口
 
-![image-20250225214234418](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225214234418.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225214234418.png)
 
 很明显，Servlet接口的service方法就是可以用来替换doGet、doPost的方法
 
-![image-20250225214334624](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225214334624.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225214334624.png)
 
 所以Java代码下，用kingkk师傅构造的从ApplicationFilterChain取resquest 的 servlet+TemplatesImpl code如下：
 
@@ -651,7 +651,7 @@ public class GenericTomcatMemShell extends AbstractTranslet {
 
 ```
 
-![image-20250226170934557](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226170934557.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226170934557.png)
 
 
 
@@ -667,15 +667,15 @@ public class GenericTomcatMemShell extends AbstractTranslet {
 
 回想起这个图，ApplicationFilterChain都已经在尾巴上了
 
-![tomcat3](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoratomcat3.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoratomcat3.png)
 
 从最开始的Http11Processor开始看起
 
 其核心方法肯定是service()，在service()方法内，调用了`getAdapter().service(request,response)`，其中的参数request,response静态变量分别是Request和Response对象
 
-![image-20250225220523013](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225220523013.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225220523013.png)
 
-![image-20250225220841715](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225220841715.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225220841715.png)
 
 如果能获取Request、Response，那参照上面JSP获取StandardContext的方法2
 
@@ -683,79 +683,79 @@ public class GenericTomcatMemShell extends AbstractTranslet {
 
 request和response并不是Http11Processor的字段，而是其父类AbstractProcessor的字段
 
-![image-20250225222316854](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225222316854.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225222316854.png)
 
 找下看request和response在哪赋的值，栈里面可以看出在Http11Processor.service的上两帧，调用了`AbstarctProtocol$ConnectionHandler#process`
 
-![image-20250225223400573](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225223400573.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250225223400573.png)
 
 在调用到AbstractProcessorLight之前，有两个processor == null的if块。第一个是从recycledProcessors出栈，也就是看看缓存表里是否已有Processor了；第二个if块内，也就是缓存表里没有Processor，就调用createProcessor()新建一个。
 
-![image-20250226130348255](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226130348255.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226130348255.png)
 
 变量里可以看出，这里创建的就是Http11Processor
 
-![image-20250226130841230](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226130841230.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226130841230.png)
 
 至于为什么会进到AbstractProcessorLight#process，是因为Http11Processor的父类就是AbstractProcessor
 
-![image-20250226131555015](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226131555015.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226131555015.png)
 
 在调用createProcessor()后，还调用到了register
 
-![image-20250226131743486](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226131743486.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226131743486.png)
 
 重新打个断点调试一下，跟进register，可以看到从Http11processor里调用getRequest()获取到了请求对象，再调用getRequestProcessor()获取到了RequestInfo，具体中间怎么获取的不用管
 
-![image-20250226132422355](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226132422355.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226132422355.png)
 
 然后调用了setGlobalProcessor，把global存进了上一步得到的RequestInfo
 
-![image-20250226133233844](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226133233844.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226133233844.png)
 
 可以看到global其实就是一个包含了一堆RequestInfo的RequestGroupInfo
 
-![image-20250226133626092](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226133626092.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226133626092.png)
 
 这个global里就包含了我们需要的request
 
 因为global属于AbstractProctocol$ConnectionHandler，是内部类
 
-![image-20250226134148428](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226134148428.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226134148428.png)
 
 查找一下，哪里调用了这个内部类的构造函数，找到AbstractHttp11Protocol构造函数吧内，实例化了ConnectionHandler，并调用setHandler存储
 
-![image-20250226134744512](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226134744512.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226134744512.png)
 
 有setter就有getter，可以取出ConnectionHandler
 
-![image-20250226135957191](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226135957191.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226135957191.png)
 
 AbstractHttp11Protocol是个抽象类，肯定要找其实现类去获取：
 
-![image-20250226141310770](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226141310770.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226141310770.png)
 
 不过能用的（不是抽象类）有点小多
 
-![image-20250226143805053](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226143805053.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226143805053.png)
 
 正常的Java应用都用的Http11NioProtocol
 
 然后天才师傅想到，从Http11Processor这个connector，转交到Engine的中间，也就是Http11Processor的后面一步，CoyoteAdapter.service中，涉及了一堆从connector变量中取出request和response的操作，那肯定跟上步的Http11NioProtocol有关系
 
-![image-20250226160121043](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226160121043.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226160121043.png)
 
-![image-20250226161414361](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226161414361.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226161414361.png)
 
 这个connector，和上面分析AbstractHttp11Protocol什么联系？
 
 Connector类中有protocolHandler字段
 
-![image-20250226162105470](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226162105470.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226162105470.png)
 
 分析Http11NioProtocol，也实现了ProtocolHandler接口，那大概率这个字段就是其子类Http11NioProtocol
 
-![image-20250226162223584](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226162223584.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226162223584.png)
 
 查看变量信息即可验证
 
@@ -769,7 +769,7 @@ Connector类中有protocolHandler字段
 
 那怎么获取Connector？还是这个图，可以看到connector属于Service
 
-![tomcat3](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoratomcat3.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoratomcat3.png)
 
 虽然从栈上已经无法从connector追溯到Servcie，因为Http请求到达Server，Tomcat 分发到Service，对于一个单独的Http请求，Service会用一个单独的线程去处理。所以向上追溯是线程启动的栈帧。
 
@@ -777,19 +777,19 @@ Connector类中有protocolHandler字段
 
 从代码上来讲就是，Tomcat在启动时默认调用org.apache.catalina.startup.Tomcat#init()，然后调用到getConnector
 
-![image-20250226164458119](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226164458119.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226164458119.png)
 
 getConnector()首先调用getService()，然后调用addConnector
 
-![image-20250226164841285](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226164841285.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226164841285.png)
 
 addConnector把connector都放到了connectors数组里
 
-![image-20250226165003209](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226165003209.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226165003209.png)
 
 从变量能直接看出上面的关系：StandardService->connectors->Connector
 
-![image-20250226165152250](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226165152250.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226165152250.png)
 
 最后一个问题，如何获取StandardService？通过上面的getContextClassLoader()->resources->getContext()先获取StandardContext
 
@@ -803,7 +803,7 @@ addConnector把connector都放到了connectors数组里
 
 StandardContext->context(ApplicationContext)->service(StandardService)可以获取到StandardService
 
-![image-20250226173920224](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226173920224.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226173920224.png)
 
 于是思路完整：
 
@@ -937,15 +937,15 @@ public class GenericTomcatMemShell2 extends AbstractTranslet {
 
 在`AbstractProtocol$ConnectionHandler#register`中，向(RequestInfo) rp中存入global后，又把rp存入了Registry
 
-![image-20250226194304799](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226194304799.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226194304799.png)
 
 如果有办法从Registry中拿到RequestInfo，就可以绕过获取StandardContext的办法
 
 因为已知Registry里肯定有RequestInfo，所以打个断点，计算器`Registry.getRegistry(null, null)`在调试变量里慢慢找就完了
 
-![image-20250226200854601](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226200854601.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226200854601.png)
 
-![image-20250226200932656](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226200932656.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250226200932656.png)
 
 列个变量链：
 
