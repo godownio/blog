@@ -1017,7 +1017,7 @@ fastjson根据@type还原类，是在本地从0开始实例化，然后调用set
 
 如果解析函数里有JSON.toJSON，还会调用getter
 
-按以下顺序判断，满足条件的话，会被当成setter调用：
+按以下顺序判断，满足条件的话，getter会被当成setter调用：
 
 * set开头，参数长度为1，非static，方法名总长度大于3
 * 没有setter方法，有字段是bool类型，则用`is`加上首字母大写后的字段去查找（所以isName这种也算setter）

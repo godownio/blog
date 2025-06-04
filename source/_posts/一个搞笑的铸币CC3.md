@@ -16,7 +16,7 @@ img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%
 今天没事想自己写个CC3类加载
 
 结果为了顺利触发到TemplatesImpl#getTransletInstance的newInstance给我整急眼了，使劲改字段强行通过循环
-![](https://i-blog.csdnimg.cn/direct/52b9cf112fac47398f1dd43765926eb7.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/52b9cf112fac47398f1dd43765926eb7.png)
 
 刚才判定了，_auxClasses为transient，不能用这种方法
 
@@ -58,19 +58,22 @@ public class CC3TemplatesImpl {
     }
 }
 ```
-你别说，还真TM能跑。![](https://i-blog.csdnimg.cn/direct/bd39e593812d4fe8b63b3e1c14d9cc5b.png)说一下怎么搞的
+你别说，还真TM能跑。![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/bd39e593812d4fe8b63b3e1c14d9cc5b.png)说一下怎么搞的
 调试的时候bytecode数组只有一个恶意类，就创建不了hashMap，后面就put不进去。
-![](https://i-blog.csdnimg.cn/direct/00d7d3bddf1c48db8327039c4c27ac6c.png)于是我bytecode传了两个恶意数组
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/00d7d3bddf1c48db8327039c4c27ac6c.png)于是我bytecode传了两个恶意数组
+
 ```java
 	field.set(templatesClass, new byte[][]{code,code});
 ```
 结果进第二个catch，hashMap不能重复put
-![](https://i-blog.csdnimg.cn/direct/6c6442df540e46b79bcce2e74b388a0d.png)我又传了个空字节，我去，空字节不能defineClass，连循环都出不了
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/6c6442df540e46b79bcce2e74b388a0d.png)我又传了个空字节，我去，空字节不能defineClass，连循环都出不了
+
 ```java
 	field.set(templatesClass, new byte[][]{code,new byte[0]});
 ```
 突然想到，我自己搞个hashMap就完了，用他的干毛啊
 于是
+
 ```java
 else if (field.getName().equals("_auxClasses")) {
                 field.set(templatesClass, new HashMap<>());

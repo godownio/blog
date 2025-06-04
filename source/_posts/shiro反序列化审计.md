@@ -7,7 +7,6 @@ categories:
 - 框架漏洞
 tags:
 - Shiro
-- Tomcat
 img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%E7%B4%A0%E6%9D%90/1080P%20A%20%E6%94%B6%E8%97%8F%E9%87%8F%E6%9C%80%E5%A4%9A/1080PA%E5%A3%81%E7%BA%B896.png
 
 ---
@@ -52,7 +51,7 @@ Shiro 550的原理我就不再重复多分析了
 
 感兴趣的去org.apache.shiro.web.mgt.CookieRememberMeManager分析。
 
-给一个栈图，在OncePerRequestFilter的doFilter处理请求，在CookieRemberMeManager生成cookie和处理cookie。
+给一个栈图，在OncePerRequestFilter的doFilter处理请求，在CookieRememberMeManager生成cookie和处理cookie。
 
 ![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240805154744315.png)
 

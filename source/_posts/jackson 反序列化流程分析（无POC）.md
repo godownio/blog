@@ -352,6 +352,10 @@ public class jacksoncase {
 
 ![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241011154527112.png)
 
+其中令牌可以看到JsonToken，`{}`代表对象，`[]`代表数组
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418163443014.png)
+
 我们这里JSONToken令牌是START_OBJECT，表示是个对象进行反序列化
 
 ![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241011154556761.png)

@@ -35,7 +35,7 @@ fastjson调用getter：
 
 jackson调用getter：
 
-1、没有setter，有getter方法。可以直接反序列化调用
+1、没有该字段，没有setter，有getter方法，getter返回值是Map，Collection的子类。可以直接反序列化调用
 
 2、jackson-databind&core&annotations>=2.13.3，通过POJONode调用getter
 

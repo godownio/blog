@@ -70,7 +70,9 @@ checkAutoType中，用getClassFromMapping从mappings读取类，并在满足第�
 
 前者是fastjson默认反序列化器，后者是针对异常类的反序列化器
 
+这里写的比较简单了，不动的可以看详细黑白名单匹配过程
 
+https://godownio.github.io/2025/05/27/fastjson-quan-ban-ben-fan-xu-lie-hua-pi-pei-hei-bai-ming-dan-guo-cheng/
 
 先看ThrowableDeserializer
 

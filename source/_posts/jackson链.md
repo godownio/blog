@@ -154,6 +154,10 @@ pom.xml：
 
 ### enableDefaultTyping POC
 
+在调试分析jackson反序列化过程时，提到反序列化时，会根据字符串自动调用构造函数和setter赋值。https://godownio.github.io/2024/10/11/jackson-fan-xu-lie-hua-liu-cheng-fen-xi-wu-poc
+
+那什么时候会调用getter呢？我们用下面的POC做下实验
+
 Test类：
 
 ```java
@@ -198,13 +202,61 @@ public class jackson_TemplatesImpl {
 }
 ```
 
-> 怎么调用的getter？为什么我的case调用不了？妈的，分析了两天，不知道哪种情况会调用到FieldProperty.deserializeAndSet ，哪种情况会调用到setterlessProperty.deserializeAndSet。不管了，反正是抄poc。他妈我写的case也没有setter，就是要跑到FieldProperty.deserializeAndSet内反射赋值
->
-> ![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241013105457440.png)
->
-> 不管了，见版本直接打
->
-> 如果有知道原因的，QQ+1958304602 解答V9.9喝蜜雪冰城
+我们略过一些令牌提取的步骤，从上面的poc可以知道，object字段对应了一个`[...]`的数组，所以在vanillaDeserialize中会有一个嵌套的解析。
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418163719798.png)
+
+isExpectedStartArrayToken判断了一下是不是数组开头，然后`_findDeserializer`获取了数组下子属性的反序列化器，然后调用其deserialize
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418164124285.png)
+
+然后在还原子属性的时候，outputProperties取到的Property是SetterlessProperty
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418164300399.png)
+
+跟进到SetterlessProperty.deserializeAndSet，发现判断了一下其对应value是不是个对象，否则调用getter
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418164412071.png)
+
+那什么情况会调用getter呢？换句话说，什么情况会调用到SetterlessProperty呢？
+
+详细的解析过程略过，初始化SetterlessProperty的栈如下，重点关注BeanDeserializerFactory.addBeanProps
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418170117903.png)
+
+看到这个至关重要的循环，具体逻辑如下：
+
+* 如果属性有Setter方法，则通过constructSettableProperty方法创建SettableBeanProperty。
+* 如果没有Setter但有字段，则同样通过constructSettableProperty方法创建SettableBeanProperty。
+* 如果启用了useGettersAsSetters且属性有Getter方法，并且getter返回值是Collection或Map，则通过constructSetterlessProperty方法创建SettableBeanProperty。
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418170359326.png)
+
+useGettersAsSetters默认为true
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418170549640.png)
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418170525469.png)
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418170541534.png)
+
+我们所传入的outputProperties，TemplatesImpl内是没有这个字段的，而且也没有对应的setter。而且该方法返回的Properties也是Map的子类
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418170830371.png)
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418170856881.png)
+
+所以理论上来说，jackson调用getter也是有相当大的局限的
+
+还记得上面提到的准备反序列化数组时`AsArrayTypeDeserializer._findDeserializer`获取子属性的反序列化器吗
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418164732437.png)
+
+一直跟进到BeanDeserializerBase，循环为数组每个prop装配Deserializer
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250418165313954.png)
+
+
 
 其他的就是调setter赋值了，注意jackson能调用私有的setter
 

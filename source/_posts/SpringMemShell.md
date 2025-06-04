@@ -879,6 +879,8 @@ public class ControllerMemShell extends AbstractTranslet {
 
 此处不再记载spring3.1以下的Controller马，以上适用于spring>=3.1
 
+另外，关于doDispatch的详解：https://godownio.github.io/2025/03/25/spring-dispatcherservlet-xiang-jie/
+
 ## interceptor内存马调试分析
 
 ### 调试
@@ -975,6 +977,49 @@ interceptor.preHandler -> interceptor.afterCompletion ->  Controller -> intercep
 listener.requestInitialized -> filter.doFilter(假如filter插入到最前面) -> interceptor.preHandler -> interceptor.afterCompletion ->  Controller -> interceptor.postHandle 
 
 Valve独立出来因为可以插入到不同的位置。servlet马我们等下另外分析
+
+总结DispatcherServlet.doDispatch如下：
+
+```java
+protected void doDispatch(HttpServletRequest request, HttpServletResponse response) 
+							throws Exception {
+		...
+		//1、根据URL（当然不一定非得是URL）匹配到一个处理器
+		mappedHandler = getHandler(processedRequest);
+		if (mappedHandler == null) {
+			// 若匹配不到Handler处理器，就404了
+			noHandlerFound(processedRequest, response);
+			return;
+		}
+
+		//2、从HandlerExecutionChain里拿出Handler（注意是Object类型哦~ ）然后找到属于它的适配器
+		HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
+		...
+		//3、执行作用在此Handler上的所有拦截器的Pre方法
+		if (!mappedHandler.applyPreHandle(processedRequest, response)) {
+			return;
+		}
+		//4、真正执行handle方法（也就是你自己书写的逻辑方法），得到一个ModelAndView
+		mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+
+		//5、视图渲染
+		applyDefaultViewName(processedRequest, mv);
+		
+		//6、执行拦截器的post方法（可见它是视图渲染完成了才会执行的哦~）
+		mappedHandler.applyPostHandle(processedRequest, response, mv);
+		...
+		//7、执行拦截器的afterCompletion方法（不管抛出与否）
+	}
+```
+
+1、请求首先进入DispatcherServlet， 由DispatcherServlet 从HandlerMappings中匹配对应的Handler，此时只是获取到了对应的Handler，然后拿着这个Handler去寻找对应的适配器，即：HandlerAdapter；
+
+2、拿到对应HandlerAdapter时，这时候开始调用对应的Handler方法，即执行我们的Controller来处理业务逻辑了， 执行完成之后返回一个ModeAndView；
+
+3、HandlerAdapter执行完之后，返回一个ModeAndView，把它交给我们的视图解析器ViewResolver，通过视图名称查找出对应的视图然后返回；
+
+4、最后，渲染视图 返回渲染后的视图。
+
 
 
 

@@ -38,7 +38,7 @@ services:
 
 使用`docker exec -it weblogic /bin/bash` 进入容器，修改`/root/Oracle/Middleware/user_projects/domains/base_domain/bin/setDomainEnv.sh`
 
-[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031174834776-898289365.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031174834776-898289365.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031174834776-898289365.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031174834776-898289365.png)
 
  添加两行代码
 
@@ -55,13 +55,13 @@ export debugFlag
 
 `docker cp weblogic:/root ./weblogic_jars`
 
-[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175023249-413470801.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175023249-413470801.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031175023249-413470801.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175023249-413470801.png)
 
 然后idea打开`/root/Oracle/Middleware/wlserver_10.3/`目录
 
 如图
 
-[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175129518-1227494194.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175129518-1227494194.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031175129518-1227494194.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175129518-1227494194.png)
 
 然后使用命令把Middleware目录下所有的*.jar包都放在一个test的文件夹里。
 
@@ -69,45 +69,45 @@ export debugFlag
 
 `find ./ -name *.jar -exec cp {} ./test/ \;`
 
-[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175246338-402360036.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175246338-402360036.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031175246338-402360036.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175246338-402360036.png)
 
 然后在libraries下添加test目录
 
-[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175324633-1279780349.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175324633-1279780349.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031175324633-1279780349.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175324633-1279780349.png)
 
 在jdk这块选用weblogic10.3.6自带的jdk6
 
-[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175401969-1626244476.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175401969-1626244476.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031175401969-1626244476.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175401969-1626244476.png)
 
  都增加以后
 
-[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175418941-438835508.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175418941-438835508.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031175418941-438835508.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175418941-438835508.png)
 
 这块就会出现两个目录。
 
 然后我们添加远程服务器。
 
-[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175459102-1115823273.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175459102-1115823273.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031175459102-1115823273.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175459102-1115823273.png)
 
  端口号是8453
 
-[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175516574-482328806.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175516574-482328806.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031175516574-482328806.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175516574-482328806.png)
 
  然后应用，开启debug
 
 当console出现下面图片时候，说明可以了。
 
-[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175606211-1788033283.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175606211-1788033283.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031175606211-1788033283.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175606211-1788033283.png)
 
 然后在`/wlserver_10.3/server/lib/weblogic.jar!/weblogic/wsee/jaxws/WLSServletAdapter.class`的129行下断点
 
-*[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175732510-274443972.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175732510-274443972.png)*
+*[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031175732510-274443972.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175732510-274443972.png)*
 
 burp在wls-wsat进行发包
 
 当出现下图时，说明成功了。
 
-[![](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175806877-931381151.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175806877-931381151.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/650236-20191031175806877-931381151.png)](https://img2018.cnblogs.com/blog/650236/201910/650236-20191031175806877-931381151.png)
 
  
 
