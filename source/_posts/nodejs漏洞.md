@@ -97,6 +97,8 @@ setTimeout(()=>{
 
 ### Function()
 
+类似js的自调用函数
+
 `Function(string)()`，类似php的create_function，创建函数并立即调用
 
 ```js
@@ -295,7 +297,7 @@ objectname.constructor.prototype
 
 抄个图，一眼懂。
 
-![image-20240927151537978](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927151537978.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927151537978.png)
 
 不同对象所生成的原型链如下(部分)：
 
@@ -508,11 +510,11 @@ npm下不了express的，执行`npm i gulp-connect@5.6.1`
 
 然后编辑配置
 
-![image-20240927180031882](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927180031882.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927180031882.png)
 
 重点看下server.js，定义了一个处理根路径请求的路由，调用lodashs.merge对POST body和data进行处理
 
-![image-20240927195810158](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927195810158.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927195810158.png)
 
 而data的定义在上一排
 
@@ -522,9 +524,11 @@ data 包含两个属性：language 和 category，它们都是数组类型。
 
 而且也满足JSON解析请求体，使用了body-parser处理URL编码和JSON请求体，已经满足了原型链污染的条件了
 
-![image-20240927201011765](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927201011765.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927201011765.png)
 
 原型链污染是有了，还没找到能命令执行的点
+
+
 
 ok，通读一下代码
 
@@ -540,7 +544,7 @@ ok，通读一下代码
 
 看到有个自执行函数：
 
-![image-20240927220053182](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927220053182.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927220053182.png)
 
 控制sourceURL或者source就能执行任意代码
 
@@ -550,11 +554,11 @@ sourceURL就很干净，options默认为undefined，如果我们能污染options
 
 `sourceURL = '//# sourceURL= options.sourceURL'`，就能执行任意代码
 
-![image-20240927220958006](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927220958006.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927220958006.png)
 
 从控制台看到options是Object
 
-![image-20240927222038209](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927222038209.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240927222038209.png)
 
 我们通过之前的根目录路由，污染Object，使其sourceURL属性为
 
@@ -576,11 +580,11 @@ sourceURL就很干净，options默认为undefined，如果我们能污染options
 npm install node-serialize@0.0.4
 ```
 
-漏洞代码位于node_modules\node-serialize\lib\serialize.js中s
+漏洞代码位于node_modules\node-serialize\lib\serialize.js中
 
 直接看到执行代码的地方：
 
-![image-20240928211918215](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240928211918215.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240928211918215.png)
 
 读一下这个函数：
 
@@ -588,7 +592,7 @@ npm install node-serialize@0.0.4
 * 遍历对象的属性，递归反序列化嵌套的对象
 * 如果属性值以`_$$ND_FUNC$$_`开头，则执行eval
 
-![image-20240928214539463](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240928214539463.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240928214539463.png)
 
 eval前后用括号包裹，如果obj是外部参数，那我们中间是不是可以套一个自执行函数？
 

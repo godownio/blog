@@ -40,7 +40,7 @@ img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%
 
 Ubuntu搭建的时候，docker死活换不了源，windows docker有一台能复现，另外一台运行到cp weblogic_install.sh的时候报错，最后用的kali搭建，需要换源+更改docker配置限制
 
-![image-20241125213351021](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241125213351021.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241125213351021.png)
 
 漏洞复现建议jdk7u21+weblogic1036
 
@@ -260,7 +260,7 @@ public class WebLogicExploit {
 
 如果接收的是个对象，则var2 = 0 返回一个ServerChannelInputStream
 
-![image-20241126134532396](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126134532396.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126134532396.png)
 
 ServerChannelInputStream()继承自ObjectInputStream，重写了resolveClass方法。
 
@@ -270,49 +270,49 @@ ServerChannelInputStream()继承自ObjectInputStream，重写了resolveClass方�
 
 由于我们传输的是Object，自然调用到readOrdinaryObject
 
-![image-20241126135433639](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126135433639.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126135433639.png)
 
 其实这里tc = 115，十六进制为73，来自aced 0005后的第一个字节
 
-![image-20241126140410714](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126140410714.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126140410714.png)
 
-![image-20241126140425685](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126140425685.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126140425685.png)
 
 下一个字节72 = 114，于是调用readNonProxyDesc，注意看上面的case，分别是Reference和Proxy的还原，有的payload打的Anno代理就会走到readProxyDesc
 
-![image-20241126142656127](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126142656127.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126142656127.png)
 
 readNonProxyDesc对我们传入的HashMap恶意对象调用resolveClass
 
-![image-20241126143045299](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126143045299.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126143045299.png)
 
 于是走到了ServerChannelInputStream重写的resolveClass，然后调用了父类的resolveClass，很明显父类是ObjectInputStream
 
-![image-20241126143227542](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126143227542.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126143227542.png)
 
 ObjectInputStream$resolveClass会调用Class.forName
 
-![image-20241126143514871](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126143514871.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126143514871.png)
 
 所以这里返回的cl就是HashMap，但是并没有调用readObject，那是在哪调用的呢？
 
-![image-20241126144606671](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126144606671.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126144606671.png)
 
 继续回到ObjectInputStream.readOrdinaryObject，先是newInstance实例化HashMap，然后调用readSerialData
 
-![image-20241126144919766](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126144919766.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126144919766.png)
 
 readSerialData里会调用invokeReadObject
 
-![image-20241126145304736](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126145304736.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126145304736.png)
 
 其实就是反射调用readObject啦，到这就能触发反序列化链
 
-![image-20241126145343103](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126145343103.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126145343103.png)
 
 为什么能打CC呢？weblogic自带了
 
-![image-20241126145554186](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126145554186.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241126145554186.png)
 
 
 

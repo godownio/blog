@@ -74,11 +74,11 @@ datetime:
 
 `-`的作用：
 
-![image-20250417161408050](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417161408050.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417161408050.png)
 
-![image-20250417161422499](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417161422499.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417161422499.png)
 
-![image-20250417161428690](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417161428690.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417161428690.png)
 
 # SnakeYaml反序列化
 
@@ -340,7 +340,7 @@ snakeYaml和fastjson很像，可以借鉴一下fastjson的payload
 
 phith0n师傅做了一张图，copy一下
 
-![image-20250415182117465](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250415182117465.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250415182117465.png)
 
 不出网的情况下，fastjson有一条1.2.68+commons-io写文件的链子。在分析这条链子的时候提到OpenJDK>=11能无需commons-io依赖直接写文件的MarshalOutputStream POC
 
@@ -352,7 +352,7 @@ fastjson在找不到默认无参构造函数的情况下，会遍历所有构造
 
 [![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241025163356883.png)](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241025163356883.png)
 
-[![img](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241025163345217.png)](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241025163345217.png)
+[![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241025163345217.png)](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20241025163345217.png)
 
 缺失了LocalVeriableTable并不会影响类的正常使用和反射调用，但是会使调试出现问题，无法提供方法中局部变量的名称、类型和作用范围等信息。
 
@@ -494,7 +494,7 @@ jdk>=11，有h2database的情况下，能打h2 JDBC Attack
 
 fastjson>=1.2.36可以通过$ref调用getter，如果目标有h2database的依赖，可以通过调用org.h2.jdbcx.JdbcDataSource#getConnection打h2database的jdbc attack
 
-![image-20250417122145100](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417122145100.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417122145100.png)
 
 ```json
 [
@@ -543,7 +543,7 @@ https://github.com/vulhub/vulhub/blob/master/h2database/h2-console-unacc/README.
 
 其实JdbcConnection构造函数的第二个参数是Properties，我们完全可以将INIT这种属性放到这里面。
 
-![image-20250417155614271](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417155614271.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250417155614271.png)
 
 以减少URL参数中的转义，然后将YAML修改成我们更熟悉的样式：
 

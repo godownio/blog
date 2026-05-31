@@ -63,6 +63,34 @@ JAVA URLClassLoader过滤了http和file协议可以用jar协议绕过
 
 审代码，看到有读文件，然后根据布尔值来读的，一定要想起竞争！遇到很多次了
 
+sql fuzz（来自2025ciscn初赛）：https://www.cnblogs.com/perl6/p/6120045.html#3573210
+
+有反序列化写文件链子，无法加载charsets.jar的情况（当然也能运行其他非黑名单code才行）：因为我们手上有附件，可以用`-verbose:class`本地运行jar包，看看加载了哪些jar
+
+1、没有加载dnsns.jar，可以通过反序列化`sun.net.spi.nameservice.dns.DNSNameServiceDescriptor`触发`dnsns.jar`加载
+
+2、没有加载jce.jar，可以通过重写jar中的javax.crypto.NoSuchPaddingException类来加载
+
+路径可以去spring fatjar写charsets.jar文里用字典全部遍历一遍
+
+redis持久化文件dump.rdp，有任意文件读+redis的时候考虑使用（2026软件赛初赛），字典也应该跑一遍（2025华为杯决赛）
+
+codeql不构建的情况下生成数据库（就可以不编译了，提前jadx反编译出来：
+
+```plain
+codeql database create db-name --language=java --source-root=./sources --build-mode=none
+```
+
+有数据库构建：
+
+```plain
+codeql database create db_name --language="java" --command="mvn clean install --file pom.xml" --source-root=~/micro-service-seclab/
+```
+
+
+
+
+
 ### 单参数exec绕过
 
 一般用的是单参数exec
@@ -85,17 +113,25 @@ fastjson目标不出网，<=1.2.24下打BCEL，需要回显可以打内存马
 
 github上有payload项目，我所知的唯一缺少的是fastjson>1.2.36+有h2依赖能打jdbc attack
 
-
+在线java内存马MemShellParty生成https://party.mem.mk/ui
 
 
 
 ## Gadget
 
+别人的导图，太叼了https://github.com/1diot9/MyJavaSecStudy/blob/main/%E5%88%A9%E7%94%A8%E9%93%BE%E5%AF%BC%E5%9B%BE
+
+java-search-object从线程找变量
+
 一个gadget衔接合集，仅统计常用衔接链
 
-Hessian2反序列化和Kryo、FST反序列化会触发hashMap.put
+Hessian2反序列化和Kryo、FST反序列化会触发hashMap.put，hashCode/equals/compareTo
+
+发现一个超全的hessian反序列化分析：https://1diot9.github.io/2026/03/06/Hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%95%B4%E7%90%86/
 
 compare通常伴随着任意getter调用（因为compare需要逐项取值对比）
+
+CodeSigner.toString->List.get()(See lilctf 2025)
 
 BadAttributeValueExpException.readObject -> toString
 
@@ -107,6 +143,12 @@ EventListenerList.readObject() -> tostring
 
 
 
+UTF-8 Overlong Encodeing 绕过字符串正则型WAF
+
+RMIConnector#connect ->findRMIServer ->findRMIServerJRMP 对base64String二次反序列化
+
+(CC 3.2.1&&CC 4) TransformedList.set() -> transform
+
 (JDK8u65) AnnotationInvocationHandler.invoke -> get
 
 (jdk7u21/8u20 rce) AnnotationInvocationHandler.equalsImpl -> invoke 
@@ -114,8 +156,6 @@ EventListenerList.readObject() -> tostring
 PriorityQueue.readObject -> compare
 
 (cb) PropertyUtils.getProperty -> getter
-
-
 
 (jackson/springboot) POJONode.toString -> JSON.writeValueAsString ->getter
 
@@ -131,15 +171,29 @@ PriorityQueue.readObject -> compare
 
 (fastjson) JSONObject.toString -> getter (1.2.83都能打原生二次反序列化)
 
+(Spring-AOP && aspectjweaver) 任意方法调用
+
 
 
 signedObject.getObject -> readObject
 
-JdbcRowSetImpl.setAutoCommit ->  JNDI
+JdbcRowSetImpl.setAutoCommit(is setter) ->  JNDI
+
+JdbcRowSetImpl.getDatabaseMetaData(is getter) -> JNDI
+
+LdapAttribute.getAttributeDefinition（is getter) -> JNDI
 
 (resin) com.caucho.naming.QName#toString -> JNDI
 
 (Tomcat) BasicDataSource.getConnection -> Class.forName
+
+
+
+(hibernate v4) BasicPropertyAccessor$BasicGetter.get -> getter
+
+(hibernate v5) GetterMethodImpl.get() -> getter
+
+(hibernate 反序列化) ComponentType.getPropertyValue() -> get
 
 
 
@@ -164,9 +218,11 @@ Abstractmap.equals
 equals
 ```
 
+UsingToStringOrdering.compare ->toString
+
 (spring) ClassPathXmlApplicationContext.ClassPathXmlApplicationContext -> spEL注入
 
-
+com.google.api.client.util.IOUtils.deserialize二次反序列化（见alictf 2026 Fileury）
 
 
 
@@ -186,6 +242,53 @@ TrAXFilter.TrAXFilter -> newTransformer (CC3)
 
 TiedMapEntry.toString -> getValue -> get (CC5)
 
+LazyMap.get->put
+
+
+
+### JDBC Attack
+
+打CPX的如果有Tomcat，都可以搭配ascii-jar写文件加载
+
+(databricks) ->JNDI(alictf 2026MHGA)
+
+(mysql)fakeserver->readObject原生反序列化
+
+(PostgreSQL)socketFactory+socketFactoryArg->constructor（打CPX）
+
+(PostgreSQL)loggerLevel+loggerFile->writeFile
+
+(h2database)RUNSCRIPT->远程加载SQL 出网
+
+(h2database)CREATE TRIGGER创建触发器->执行JavaScript/执行java代码/Groovy AST
+
+(Jre17 +h2database)commons-io写文件+commons-beanutils MethodUtils反射调用System.load
+
+(IBM DB2)->JNDI
+
+(ModeShape)->JNDI
+
+(Derby)JNDIServer->readObject原生反序列化
+
+(sqlite)`jdbc:sqlite::resource:http://127.0.0.1:8888/poc.db`上传任意文件->create view劫持select语句->load_extension加载动态链接库
+
+(Tomcat)org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory JNDI->JDBC
+
+
+
+### JNDI HignVersion
+
+getObjectInstance大集合
+
+(Hessian)HessianProxyFactory JNDI to Hessian反序列化
+
+(Tomcat)beanFactory 构造一个恶意ResourceRef类，forceString参数调用任意方法
+
+org.apache.catalina.users.MemoryUserDatabaseFactory JNDI to XXE
+
+org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory JNDI to JDBC
+
+(vibur)ViburDBCPObjectFactory->JDBC Attack
 
 
 
@@ -194,17 +297,107 @@ TiedMapEntry.toString -> getValue -> get (CC5)
 
 一般jwt直接破解不了的，考虑原型链污染key。一般jwt考题都伴随了原型链污染
 
-
+面试问了jwt相对session/cookie的优劣势：可以放在cookie外的header头，防止csrf
 
 
 
 ### hessian
 
-hessian一般伴随着能触发hashMap.put
+hessian一般伴随着能触发hashMap.put hashCode/equals/compareTo
 
-hessian打TemplatesImpl不能readObject初始化tfactory，直接SignedObject->TemplatesImpl
+hessian打TemplatesImpl不能readObject初始化tfactory，可以选择直接SignedObject->TemplatesImpl
+
+这个超全：
+
+https://1diot9.github.io/2026/03/06/Hessian%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%95%B4%E7%90%86/
+
+我曹，关注了1diot9，这链子图无敌了，直接偷
+
+![JavaGadget](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/JavaGadget.png)
+
+这里可以用两种打法
+
+* 打法1：hessian原生链
+
+createValue反射调用任意static方法和构造函数，因为这里没有newInstance
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20260321135711533.png)
+
+HashMap.readObject -> AbstractMap.equals ->javax.swing.UIDefaults$TextAndMnemonicHashMap.get->getFromHashtable->SwingLazyValue(only jdk8)/javax.swing.UIDefaults$ProxyLazyValue.createValue->JavaUtils.writeBytesToFilename(FileWrite)/System.load
+
+SwingLazyValue jdk8以上没了，所以jdk11用UIDefaults$ProxyLazyValue打，写dll+load加载或者CPX都可以，只要出网
+
+另外反射调用MethodUtil#invoke可以扩大到任意方法，进而加载字节码或者Runtime
 
 
+
+
+
+* 打法2：
+
+另外Hessian反序列化除了触发put，还有hashCode/equals/compareTo
+
+HashMap.readObject -> AbstractMap.equals ->javax.swing.UIDefaults$TextAndMnemonicHashMap.get -> toString
+
+这里还有jackson，所以拼上结束
+
+POJONode.toString -> JSON.writeValueAsString ->getter
+
+>Lijnux有sun.print.UnixPrintService的printer可以携带参数，然后里面有好多getter都会execCmd该参数的内容，不过这个类只在windows下有，而且是私有+没继承Serializable接口，但是在不需要Serializable场景下调用getter（hessian)就会触发漏洞，因为是私有类所以fastjson/jackson/snakeYaml这种几乎不用考虑了
+>
+>https://aecous.github.io/2023/10/01/%E5%88%9D%E6%8E%A2UnixPrintService/
+
+signedObject当然也不错
+
+
+
+### JRMP
+
+我其实有个疑问是因为JEP290，高版本不是不能打JRMP了吗
+
+>## 关于JRMP的两种攻击流程如下
+>
+>### 第一种攻击方式
+>
+>个人理解：基于RMI的反序列化中的客户端打服务端的类型
+>
+>我们需要先发送指定的payload（JRMPListener）到存在漏洞的服务器中，使得该服务器反序列化完成我们的payload后会开启一个RMI的服务监听在设置的端口上。
+>
+>我们还需要在我们自己的服务器使用exploit（JRMPClient）与存在漏洞的服务器进行通信，并且发送一个利用链，达到一个命令执行的效果。
+>
+>简单来说就是将一个payload（JRMPListener）发送到存在漏洞的服务器，存在漏洞的服务器反序列化操作该payload（JRMPListener）过后会在指定的端口开启RMI监听，然后再通过exploit（JRMPClient） 去发送利用链载荷，最终在存在漏洞的服务器上进行反序列化操作。二次反序列化这一块
+>
+>### 第二种攻击方式
+>
+>个人理解：基于RMI的反序列化中的服务端打客户端的类型，这种攻击方式在实战中比较常用
+>
+>将exploit（JRMPListener）作为攻击方进行监听。
+>
+>我们发送指定的payloads（JRMPClient）使得存在漏洞的服务器向我们的exploit（JRMPListener）进行连接，连接后exploit（JRMPListener）则会返回给存在漏洞的服务器序列化的对象，而存在漏洞的服务器接收到了则进行反序列化操作，从而进行命令执行的操作。
+>
+>PS：这里的payload和exploit就是指的不同包下的JRMPListener和JRMPClient！
+>
+>Ref：https://www.cnblogs.com/zpchcbd/p/14934168.html
+>
+>而且这里开监听用的是yso exploit下的代码，另一端执行用的payloads下的代码。打JNDI的话直接输地址就行了，连Client都省了
+
+所以第二种打法是无版本限制的
+
+>另外，当个乐子看，在 exploit/JRMPListener 和 payloads/JRMPClient 的利用过程中，这个 server 端和 client  端，攻击者和受害者的角色是可以互换的，在你去打别人的过程中，很有可能被反手一下，所以最好的情况就是，只是发送数据，不去接受另一端传过来的信息，所以说用这个 exploit/JRMPClient 是不会自己打自己的
+
+所以如果打JRMPLisenter，这里的poc是直接改ysoserial的这里，好像不用改源码也行？参数指定就行了
+
+https://github.com/1diot9/CTFSolutions/blob/main/idea/2026/AliyunCTF/MHGA/src/main/java/solution/JRMPListener.java
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20260321153108038.png)
+
+Client直接lookup
+
+`initialContext.lookup("rmi://127.0.0.1:1399/any");`
+
+
+
+这里其实来自alictf2026MHGA的非预期我才学到的，之前一直都没能理解
 
 
 

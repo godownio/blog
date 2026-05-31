@@ -15,8 +15,6 @@ img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%
 
 在写CC6的时候，发现后半截是URLDNS的链，来重新构造一遍URLDNS。
 
-他妈的，护网还被鸽了，面试是没挂过的，项目是没去过的。
-
 ## URLDNS
 
 ### DNS解析

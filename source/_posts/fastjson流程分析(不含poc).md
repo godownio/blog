@@ -1023,3 +1023,29 @@ fastjson根据@type还原类，是在本地从0开始实例化，然后调用set
 * 没有setter方法，有字段是bool类型，则用`is`加上首字母大写后的字段去查找（所以isName这种也算setter）
 * 没有setter方法，有getter方法，参数长度为0，返回类型是属于Collection 或其子类、Map 或其子类、AtomicBoolean、AtomicInteger、AtomicLong的一种
 
+
+
+code-breaking-2025
+
+apache Hertznn
+
+XStream
+
+Spring Cloud GateWay
+
+Nacos
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

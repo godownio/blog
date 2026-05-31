@@ -12,7 +12,7 @@ img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%
 
 本文key点就在于apache Hessian2反序列化会触发readMap，进而触发hashMap.put
 
-![image-20250228195203630](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250228195203630.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250228195203630.png)
 
 首先，先介绍一下JAVA RPC
 

@@ -3,12 +3,10 @@ title: "JSONP劫持"
 onlyTitle: true
 date: 2022-08-18 13:05:36
 categories:
+- 蓝队
 - 溯源
-- JSONP
 tags:
 - 溯源
-- JSONP
-- 蜜罐
 img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%E7%B4%A0%E6%9D%90/1080P%20A%20%E6%94%B6%E8%97%8F%E9%87%8F%E6%9C%80%E5%A4%9A/1080PA%E5%A3%81%E7%BA%B81.png
 
 ---

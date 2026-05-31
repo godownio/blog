@@ -199,7 +199,7 @@ public class EvilJNDIServer {
 
 
 
-## JNDI绑定Reference
+## RMI JNDI绑定Reference
 
 服务端同样需要RemoteInterface、RemoteImpl、RMIServer
 
@@ -476,3 +476,67 @@ ldap://127.0.0.1:1099/#JNDI_RuntimeEvil
 
 
 总之有JNDI，建议直接LDAP打，除非服务器禁了LDAP协议
+
+
+
+## JNDI Reference那些事
+
+JNDI实际上在两个类型下走的是两个注入逻辑
+
+### 类型1：RMI Reference封装
+
+marshalsec生成的就是这个类型的poc
+
+在RMI协议下，用Reference封装传输的类，是会经过RegistryContext.lookup调用decodeObject去解封装的。跟进这个decodeObject可以发现，调用了NamingManager.getObjectInstance
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250604162529427.png)
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250604162548373.png)
+
+接下来的代码我们很熟悉了，就是判断是否为Reference，并调用getObjectFactoryFromReference和factory.getObjectInstance
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250604162840413.png)
+
+从InitialContext开始调用栈如下：
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250604162949263.png)
+
+
+
+事实上RMI型进行JNDI注入也必须用Reference封装，详情见https://godownio.github.io/2024/09/25/jndi-zhu-ru/#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90
+
+### 类型2：LDAP 非Reference封装
+
+LDAP协议进行JNDI注入时不需要用Reference封装，我们看栈，跟上面对比得到不同的是从URL生成的Context是ldapURLContext，导致了后续的处理不同
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250604172421360.png)
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250604172456975.png)
+
+在LdapCtx.c_lookup中，调用了DirectoryManager.getObjectInstance
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250604172549271.png)
+
+可以发现DirectoryManager.getObjectInstance和NamingManager.getObjectInstance几乎没区别
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250604172656933.png)
+
+因为NamingManager的作用如下：
+
+- 作用范围较广，包含普通命名服务（如：`java:comp/env`）的处理。
+
+- 处理 URL 前缀（如：`ldap:`、`rmi:`、`corba:`）并定位适当的上下文工厂。
+
+DirectoryManager是 `NamingManager` 的一个子集或专门扩展，**专门用于支持目录服务（如 LDAP）相关操作**。处理带属性的对象工厂实例创建，类似于 NamingManager，但面向更“结构化”的服务，如 LDAP 目录。两个的核心逻辑其实没什么区别
+
+### 二者的区别
+
+我们回过头来看为什么RMI不能用非Reference去注入，跟进这个registry.lookup
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250604170940427.png)
+
+是我们熟悉的RegistryImpl_Stub.lookup，不过这个方法显然只能触发RMI的原生反序列化攻击，也就是JRMP，而不是JNDI，它并没有调用到getObjectFactoryFromReference和factory.getObjectInstance，可以说JNDI我们只看这两个方法，而不是lookup
+
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250604171016229.png)
+
+所以我们理论上可以总结为，RMI打JNDI就是要用Reference封装，而Ldap打JNDI，我们是自己写了一个Ldap服务器，你去看代码逻辑可以知道是把恶意http地址绑定在了attribute上，而没有用到Reference

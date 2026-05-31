@@ -3,10 +3,9 @@ title: "HTB 第七期 Escapetwo"
 onlyTitle: true
 date: 2025-3-20 22:35:15
 categories:
-- 内网渗透
-- HTB WP
+- 渗透
+- HTB
 tags:
-- 域渗透
 - HTB
 img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%E7%B4%A0%E6%9D%90/1080P%20A%20%E6%94%B6%E8%97%8F%E9%87%8F%E6%9C%80%E5%A4%9A/1080PA%E5%A3%81%E7%BA%B8139.png
 ---

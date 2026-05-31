@@ -3,10 +3,10 @@ title: "vulnhub靶机渗透RAVEN1"
 onlyTitle: true
 date: 2023-06-27 13:05:36
 categories:
-- 内网渗透
-- 靶机
+- 渗透
+- vulnhub
 tags:
-- 内网渗透
+- 渗透
 - vulnhub
 img: https://typora-202017030217.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87%E7%B4%A0%E6%9D%90/1080P%20A%20%E6%94%B6%E8%97%8F%E9%87%8F%E6%9C%80%E5%A4%9A/1080PA%E5%A3%81%E7%BA%B872.jpg
 ---

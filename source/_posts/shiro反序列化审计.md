@@ -41,7 +41,7 @@ https://archive.apache.org/dist/tomcat/tomcat-8/
 
 解压后IDEA编辑配置，选择Tomcat本地，运行即可。运行后访问主页如下：
 
-![](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240805113952439.png)
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20240805113952439.png)
 
 需要调试Tomcat的，把Tomcat下的lib库导入项目库
 

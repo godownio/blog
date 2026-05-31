@@ -243,6 +243,8 @@ tabby.build.isNeedToProcessXml            = true
 
 https://github.com/wh1t3p1g/tabby-vul-finder
 
+![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20260311222112072.png)
+
 随便找了个有XStream依赖的项目做测试：
 
 ![](https://typora-202017030217.oss-cn-beijing.aliyuncs.com/typora/image-20250401130839687.png)
