@@ -207,7 +207,7 @@ println(hudson.util.Secret.fromString("{AQAAABAAAAAgqoi+w8f2N/rXi0qZEha5nGPamO0C
 总感觉我打过这个？？？
 
 ```
-glpat-2Z7YFA6k57s93VHMvHxh
+gitlab key，这里因为github有cicd的时候自动扫硬编码所以我不贴了
 ```
 
 带着密钥授权访问gitlab 也就是42主机
